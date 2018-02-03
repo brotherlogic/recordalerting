@@ -13,10 +13,42 @@ import (
 	"google.golang.org/grpc"
 
 	pbgh "github.com/brotherlogic/githubcard/proto"
+	pbgd "github.com/brotherlogic/godiscogs"
 	pbg "github.com/brotherlogic/goserver/proto"
 	"github.com/brotherlogic/goserver/utils"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 )
+
+type rc interface {
+	getRecords() ([]*pbrc.Record, error)
+}
+
+type prodRC struct{}
+
+func (gh *prodGh) getRecords() ([]*pbrc.Record, error) {
+	host, port, err := utils.Resolve("recordcollection")
+
+	if err != nil {
+		return []*pbrc.Record{}, err
+	}
+
+	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	defer conn.Close()
+	if err != nil {
+		return []*pbrc.Record{}, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client := pbrc.NewRecordCollectionServiceClient(conn)
+	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 1362206}}})
+
+	if err != nil {
+		return []*pbrc.Record{}, err
+	}
+
+	return recs.GetRecords(), nil
+}
 
 type gh interface {
 	alert(r *pbrc.Record, text string) error
