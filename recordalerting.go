@@ -20,12 +20,12 @@ import (
 )
 
 type rc interface {
-	getRecords() ([]*pbrc.Record, error)
+	getRecordsInPurgatory() ([]*pbrc.Record, error)
 }
 
 type prodRC struct{}
 
-func (gh *prodGh) getRecords() ([]*pbrc.Record, error) {
+func (gh *prodRC) getRecordsInPurgatory() ([]*pbrc.Record, error) {
 	host, port, err := utils.Resolve("recordcollection")
 
 	if err != nil {
@@ -56,7 +56,7 @@ type gh interface {
 
 type prodGh struct{}
 
-func (gh *prodGh) recordMissing(r *pbrc.Record, text string) error {
+func (gh *prodGh) alert(r *pbrc.Record, text string) error {
 	host, port, err := utils.Resolve("githubcard")
 
 	if err != nil {
@@ -79,11 +79,15 @@ func (gh *prodGh) recordMissing(r *pbrc.Record, text string) error {
 //Server main server type
 type Server struct {
 	*goserver.GoServer
+	rc rc
+	gh gh
 }
 
 // Init builds the server
 func Init() *Server {
 	s := &Server{GoServer: &goserver.GoServer{}}
+	s.gh = &prodGh{}
+	s.rc = &prodRC{}
 	return s
 }
 
@@ -119,6 +123,7 @@ func main() {
 	server := Init()
 	server.PrepServer()
 	server.Register = server
+	server.RegisterRepeatingTask(server.alertForPurgatory, time.Hour)
 
 	server.RegisterServer("recordalerting", false)
 	server.Log("Starting!")
