@@ -13,5 +13,7 @@ func (s *Server) alertForPurgatory() {
 				}
 			}
 		}
+	} else {
+		s.Log(fmt.Sprintf("Error getting records: %v", err))
 	}
 }
