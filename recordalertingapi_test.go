@@ -18,7 +18,8 @@ func (gh *testGh) alert(r *pbrc.Record, text string) error {
 }
 
 type testRc struct {
-	fail bool
+	fail  bool
+	order bool
 }
 
 func (rc *testRc) getRecordsInPurgatory() ([]*pbrc.Record, error) {
@@ -26,4 +27,27 @@ func (rc *testRc) getRecordsInPurgatory() ([]*pbrc.Record, error) {
 		return []*pbrc.Record{}, fmt.Errorf("Built to fail")
 	}
 	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}}}, nil
+}
+
+func (rc *testRc) getLibraryRecords() ([]*pbrc.Record, error) {
+	if rc.fail {
+		return []*pbrc.Record{}, fmt.Errorf("Built to fail")
+	}
+
+	if !rc.order {
+		return []*pbrc.Record{
+			&pbrc.Record{Release: &pbgd.Release{Title: "Jazz Moderne"}},
+			&pbrc.Record{Release: &pbgd.Release{Title: "Action Charme Espace"}},
+			&pbrc.Record{Release: &pbgd.Release{Title: "Paysages, Evasion, Melancolie"}},
+			&pbrc.Record{Release: &pbgd.Release{Title: "Sports Et Action"}},
+		}, nil
+	}
+
+	return []*pbrc.Record{
+		&pbrc.Record{Release: &pbgd.Release{Title: "Action Charme Espace"}},
+		&pbrc.Record{Release: &pbgd.Release{Title: "Paysages, Evasion, Melancolie"}},
+		&pbrc.Record{Release: &pbgd.Release{Title: "Jazz Moderne"}},
+		&pbrc.Record{Release: &pbgd.Release{Title: "Sports Et Action"}},
+	}, nil
+
 }
