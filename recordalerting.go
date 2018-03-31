@@ -17,13 +17,53 @@ import (
 	pbg "github.com/brotherlogic/goserver/proto"
 	"github.com/brotherlogic/goserver/utils"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
+	pbro "github.com/brotherlogic/recordsorganiser/proto"
 )
 
 type rc interface {
 	getRecordsInPurgatory() ([]*pbrc.Record, error)
+	getLibraryRecords() ([]*pbrc.Record, error)
 }
 
 type prodRC struct{}
+
+func (gh *prodRC) getLibraryRecords() ([]*pbrc.Record, error) {
+	host, port, err := utils.Resolve("recordsorganiser")
+
+	if err != nil {
+		return []*pbrc.Record{}, err
+	}
+
+	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	defer conn.Close()
+	if err != nil {
+		return []*pbrc.Record{}, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	client := pbro.NewOrganiserServiceClient(conn)
+	resp, err := client.GetOrganisation(ctx, &pbro.GetOrganisationRequest{Locations: []*pbro.Location{&pbro.Location{Name: "Library Records"}}})
+
+	if err != nil {
+		return []*pbrc.Record{}, err
+	}
+
+	if len(resp.GetLocations()) != 1 {
+		return []*pbrc.Record{}, fmt.Errorf("Too many locations returned: %v", len(resp.GetLocations()))
+	}
+
+	recs := make([]*pbrc.Record, 0)
+	for _, loc := range resp.GetLocations()[0].GetReleasesLocation() {
+		rec, err := gh.getRecord(loc.GetInstanceId())
+		if err != nil {
+			return []*pbrc.Record{}, err
+		}
+		recs = append(recs, rec)
+	}
+
+	return recs, nil
+}
 
 func (gh *prodRC) getRecordsInPurgatory() ([]*pbrc.Record, error) {
 	host, port, err := utils.Resolve("recordcollection")
@@ -48,6 +88,34 @@ func (gh *prodRC) getRecordsInPurgatory() ([]*pbrc.Record, error) {
 	}
 
 	return recs.GetRecords(), nil
+}
+
+func (gh *prodRC) getRecord(instanceID int32) (*pbrc.Record, error) {
+	host, port, err := utils.Resolve("recordcollection")
+	if err != nil {
+		return &pbrc.Record{}, err
+	}
+
+	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	defer conn.Close()
+	if err != nil {
+		return &pbrc.Record{}, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client := pbrc.NewRecordCollectionServiceClient(conn)
+	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
+
+	if err != nil {
+		return &pbrc.Record{}, err
+	}
+
+	if len(recs.GetRecords()) == 0 {
+		return &pbrc.Record{}, fmt.Errorf("No records found %v", instanceID)
+	}
+
+	return recs.GetRecords()[0], nil
 }
 
 type gh interface {
@@ -124,7 +192,7 @@ func main() {
 	server.PrepServer()
 	server.Register = server
 	server.RegisterRepeatingTask(server.alertForPurgatory, time.Hour)
-
+	server.RegisterRepeatingTask(server.alertForMisorderedMPI, time.Hour)
 	server.RegisterServer("recordalerting", false)
 	server.Log("Starting!")
 	server.Serve()

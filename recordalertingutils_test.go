@@ -4,6 +4,7 @@ import "testing"
 
 func TestPurgatory(t *testing.T) {
 	s := Init()
+	s.SkipLog = true
 	gh := &testGh{}
 	s.rc = &testRc{}
 	s.gh = gh
@@ -26,5 +27,46 @@ func TestPurgatoryFail(t *testing.T) {
 
 	if gh.count != 0 {
 		t.Errorf("Errors have been sent!")
+	}
+}
+
+func TestMPI(t *testing.T) {
+	s := Init()
+	s.SkipLog = true
+	gh := &testGh{}
+	s.rc = &testRc{}
+	s.gh = gh
+
+	s.alertForMisorderedMPI()
+
+	if gh.count != 0 {
+		t.Errorf("Errors have been sent!")
+	}
+}
+
+func TestMPIFail(t *testing.T) {
+	s := Init()
+	s.SkipLog = true
+	gh := &testGh{}
+	s.rc = &testRc{fail: true}
+	s.gh = gh
+
+	s.alertForMisorderedMPI()
+	if gh.count != 0 {
+		t.Errorf("Errors have been sent!")
+	}
+}
+
+func TestMPIOrder(t *testing.T) {
+	s := Init()
+	s.SkipLog = true
+	gh := &testGh{}
+	s.rc = &testRc{order: true}
+	s.gh = gh
+
+	s.alertForMisorderedMPI()
+
+	if gh.count == 0 {
+		t.Errorf("No errors sent!")
 	}
 }
