@@ -140,7 +140,11 @@ func (gh *prodGh) alert(r *pbrc.Record, text string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	client := pbgh.NewGithubClient(conn)
-	_, err = client.AddIssue(ctx, &pbgh.Issue{Title: "Problematic Record", Body: fmt.Sprintf("%v - %v", text, r.GetRelease().Title), Service: "recordcollection"})
+	if r != nil {
+		_, err = client.AddIssue(ctx, &pbgh.Issue{Title: "Problematic Record", Body: fmt.Sprintf("%v - %v", text, r.GetRelease().Title), Service: "recordcollection"})
+	} else {
+		_, err = client.AddIssue(ctx, &pbgh.Issue{Title: "Problematic Record", Body: fmt.Sprintf("%v", text), Service: "recordcollection"})
+	}
 	return err
 }
 
