@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+
+	"golang.org/x/net/context"
 )
 
-func (s *Server) alertForPurgatory() {
+func (s *Server) alertForPurgatory(ctx context.Context) {
 	records, err := s.rc.getRecordsInPurgatory()
 	if err == nil {
 		if len(records) > 0 {
@@ -20,7 +22,7 @@ func (s *Server) alertForPurgatory() {
 	}
 }
 
-func (s *Server) alertForMisorderedMPI() {
+func (s *Server) alertForMisorderedMPI(ctx context.Context) {
 	records, err := s.rc.getLibraryRecords()
 
 	if err != nil {
@@ -29,18 +31,22 @@ func (s *Server) alertForMisorderedMPI() {
 	}
 
 	order := []string{"Jazz Moderne", "Action Charme Espace", "Paysages, Evasion, Melancolie", "Sports Et Action"}
-	pointer := 0
+	lastSeen := -1
 
+	fail := false
 	for _, r := range records {
-		if r.GetRelease().Title == order[pointer] {
-			pointer++
-
-			if pointer >= len(order) {
-				return
+		for i, o := range order {
+			if r.GetRelease().Title == o {
+				if i < lastSeen {
+					fail = true
+				}
+				lastSeen = i
 			}
 		}
 	}
 
-	s.gh.alert(nil, fmt.Sprintf("MPI is not ordered correctly!"))
+	if fail {
+		s.gh.alert(nil, fmt.Sprintf("MPI is not ordered correctly!"))
+	}
 	return
 }

@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"golang.org/x/net/context"
+)
 
 func TestPurgatory(t *testing.T) {
 	s := Init()
@@ -9,7 +13,7 @@ func TestPurgatory(t *testing.T) {
 	s.rc = &testRc{}
 	s.gh = gh
 
-	s.alertForPurgatory()
+	s.alertForPurgatory(context.Background())
 
 	if gh.count == 0 {
 		t.Errorf("No errors sent!")
@@ -23,7 +27,7 @@ func TestPurgatoryFail(t *testing.T) {
 	s.rc = &testRc{fail: true}
 	s.gh = gh
 
-	s.alertForPurgatory()
+	s.alertForPurgatory(context.Background())
 
 	if gh.count != 0 {
 		t.Errorf("Errors have been sent!")
@@ -37,7 +41,7 @@ func TestMPI(t *testing.T) {
 	s.rc = &testRc{}
 	s.gh = gh
 
-	s.alertForMisorderedMPI()
+	s.alertForMisorderedMPI(context.Background())
 
 	if gh.count != 0 {
 		t.Errorf("Errors have been sent!")
@@ -51,7 +55,7 @@ func TestMPIFail(t *testing.T) {
 	s.rc = &testRc{fail: true}
 	s.gh = gh
 
-	s.alertForMisorderedMPI()
+	s.alertForMisorderedMPI(context.Background())
 	if gh.count != 0 {
 		t.Errorf("Errors have been sent!")
 	}
@@ -64,7 +68,7 @@ func TestMPIOrder(t *testing.T) {
 	s.rc = &testRc{order: true}
 	s.gh = gh
 
-	s.alertForMisorderedMPI()
+	s.alertForMisorderedMPI(context.Background())
 
 	if gh.count == 0 {
 		t.Errorf("No errors sent!")
