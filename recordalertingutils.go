@@ -46,7 +46,7 @@ func (s *Server) alertForMisorderedMPI(ctx context.Context) {
 	}
 
 	if fail {
-		s.gh.alert(nil, fmt.Sprintf("MPI is not ordered correctly!"))
+		s.gh.alert(nil, fmt.Sprintf("MPI is not ordered correctly!: %v", records))
 	}
 	return
 }
