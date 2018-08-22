@@ -18,8 +18,9 @@ func (gh *testGh) alert(r *pbrc.Record, text string) error {
 }
 
 type testRc struct {
-	fail  bool
-	order bool
+	fail    bool
+	order   bool
+	missing bool
 }
 
 func (rc *testRc) getRecordsInPurgatory() ([]*pbrc.Record, error) {
@@ -38,6 +39,14 @@ func (rc *testRc) getLibraryRecords() ([]*pbrc.Record, error) {
 		return []*pbrc.Record{
 			&pbrc.Record{Release: &pbgd.Release{Title: "Jazz Moderne"}},
 			&pbrc.Record{Release: &pbgd.Release{Title: "Action Charme Espace"}},
+			&pbrc.Record{Release: &pbgd.Release{Title: "Paysages, Evasion, Melancolie"}},
+			&pbrc.Record{Release: &pbgd.Release{Title: "Sports Et Action"}},
+		}, nil
+	}
+
+	if rc.missing {
+		return []*pbrc.Record{
+			&pbrc.Record{Release: &pbgd.Release{Title: "Jazz Moderne"}},
 			&pbrc.Record{Release: &pbgd.Release{Title: "Paysages, Evasion, Melancolie"}},
 			&pbrc.Record{Release: &pbgd.Release{Title: "Sports Et Action"}},
 		}, nil

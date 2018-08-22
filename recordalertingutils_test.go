@@ -74,3 +74,17 @@ func TestMPIOrder(t *testing.T) {
 		t.Errorf("No errors sent!")
 	}
 }
+
+func TestMPIMissing(t *testing.T) {
+	s := Init()
+	s.SkipLog = true
+	gh := &testGh{}
+	s.rc = &testRc{missing: true}
+	s.gh = gh
+
+	s.alertForMisorderedMPI(context.Background())
+
+	if gh.count != 0 {
+		t.Errorf("Errors have been sent!")
+	}
+}
