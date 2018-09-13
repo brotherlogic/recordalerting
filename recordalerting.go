@@ -199,5 +199,5 @@ func main() {
 	server.RegisterRepeatingTask(server.alertForMisorderedMPI, time.Hour)
 	server.RegisterServer("recordalerting", false)
 	server.Log("Starting!")
-	server.Serve()
+	log.Printf("%v", server.Serve())
 }
