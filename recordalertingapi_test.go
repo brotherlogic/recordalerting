@@ -27,7 +27,14 @@ func (rc *testRc) getRecordsInPurgatory() ([]*pbrc.Record, error) {
 	if rc.fail {
 		return []*pbrc.Record{}, fmt.Errorf("Built to fail")
 	}
-	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}}}, nil
+	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}, Metadata: &pbrc.ReleaseMetadata{}}}, nil
+}
+
+func (rc *testRc) getSaleRecords() ([]*pbrc.Record, error) {
+	if rc.fail {
+		return []*pbrc.Record{}, fmt.Errorf("Built to fail")
+	}
+	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}, Metadata: &pbrc.ReleaseMetadata{}}}, nil
 }
 
 func (rc *testRc) getLibraryRecords() ([]*pbrc.Record, error) {
