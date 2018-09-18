@@ -23,6 +23,7 @@ import (
 type rc interface {
 	getRecordsInPurgatory() ([]*pbrc.Record, error)
 	getLibraryRecords() ([]*pbrc.Record, error)
+	getSaleRecords() ([]*pbrc.Record, error)
 }
 
 type prodRC struct{}
@@ -82,6 +83,31 @@ func (gh *prodRC) getRecordsInPurgatory() ([]*pbrc.Record, error) {
 	defer cancel()
 	client := pbrc.NewRecordCollectionServiceClient(conn)
 	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 1362206}}})
+
+	if err != nil {
+		return []*pbrc.Record{}, err
+	}
+
+	return recs.GetRecords(), nil
+}
+
+func (gh *prodRC) getSaleRecords() ([]*pbrc.Record, error) {
+	host, port, err := utils.Resolve("recordcollection")
+
+	if err != nil {
+		return []*pbrc.Record{}, err
+	}
+
+	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	defer conn.Close()
+	if err != nil {
+		return []*pbrc.Record{}, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client := pbrc.NewRecordCollectionServiceClient(conn)
+	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 488127}}})
 
 	if err != nil {
 		return []*pbrc.Record{}, err
@@ -199,5 +225,5 @@ func main() {
 	server.RegisterRepeatingTask(server.alertForMisorderedMPI, time.Hour)
 	server.RegisterServer("recordalerting", false)
 	server.Log("Starting!")
-	log.Printf("%v", server.Serve())
+	fmt.Printf("%v", server.Serve())
 }

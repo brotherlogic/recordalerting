@@ -6,6 +6,17 @@ import (
 	"golang.org/x/net/context"
 )
 
+func (s *Server) alertForMissingSaleID(ctx context.Context) {
+	records, err := s.rc.getSaleRecords()
+	if err == nil {
+		for _, r := range records {
+			if r.GetMetadata().SaleId == 0 {
+				s.gh.alert(r, fmt.Sprintf("%v (%v) is missing the sale id", r.GetRelease().Id, r.GetRelease().InstanceId))
+			}
+		}
+	}
+}
+
 func (s *Server) alertForPurgatory(ctx context.Context) {
 	records, err := s.rc.getRecordsInPurgatory()
 	if err == nil {

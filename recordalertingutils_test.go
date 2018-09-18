@@ -6,6 +6,20 @@ import (
 	"golang.org/x/net/context"
 )
 
+func TestNoSale(t *testing.T) {
+	s := Init()
+	s.SkipLog = true
+	gh := &testGh{}
+	s.rc = &testRc{}
+	s.gh = gh
+
+	s.alertForMissingSaleID(context.Background())
+
+	if gh.count == 0 {
+		t.Errorf("No errors sent!")
+	}
+}
+
 func TestPurgatory(t *testing.T) {
 	s := Init()
 	s.SkipLog = true
