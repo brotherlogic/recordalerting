@@ -224,6 +224,5 @@ func main() {
 	server.RegisterRepeatingTask(server.alertForPurgatory, "alert_for_purgatory", time.Hour)
 	server.RegisterRepeatingTask(server.alertForMisorderedMPI, "alert_for_misordered_mpi", time.Hour)
 	server.RegisterServer("recordalerting", false)
-	server.Log("Starting!")
 	fmt.Printf("%v", server.Serve())
 }
