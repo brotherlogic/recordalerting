@@ -102,3 +102,25 @@ func TestMPIMissing(t *testing.T) {
 		t.Errorf("Errors have been sent!")
 	}
 }
+
+func InitTest() *Server {
+	s := Init()
+	s.SkipLog = true
+	s.gh = &testGh{}
+	s.rc = &testRc{}
+	s.ro = &testRo{}
+
+	return s
+}
+
+func TestOldListeningBox(t *testing.T) {
+	s := InitTest()
+	gh := &testGh{}
+	s.gh = gh
+
+	s.alertForOldListeningBoxRecord(context.Background())
+
+	if gh.count == 0 {
+		t.Errorf("No errors have been sent!")
+	}
+}

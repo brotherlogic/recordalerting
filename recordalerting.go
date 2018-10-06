@@ -20,7 +20,43 @@ import (
 	pbro "github.com/brotherlogic/recordsorganiser/proto"
 )
 
+type ro interface {
+	getLocation(name string) (*pbro.Location, error)
+}
+
+type prodRO struct{}
+
+func (gh *prodRO) getLocation(name string) (*pbro.Location, error) {
+	host, port, err := utils.Resolve("recordsorganiser")
+
+	if err != nil {
+		return &pbro.Location{}, err
+	}
+
+	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	defer conn.Close()
+	if err != nil {
+		return &pbro.Location{}, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	client := pbro.NewOrganiserServiceClient(conn)
+	resp, err := client.GetOrganisation(ctx, &pbro.GetOrganisationRequest{Locations: []*pbro.Location{&pbro.Location{Name: name}}})
+
+	if err != nil {
+		return &pbro.Location{}, err
+	}
+
+	if len(resp.GetLocations()) != 1 {
+		return &pbro.Location{}, fmt.Errorf("Too many locations returned: %v", len(resp.GetLocations()))
+	}
+
+	return resp.GetLocations()[0], nil
+}
+
 type rc interface {
+	getRecord(instanceID int32) (*pbrc.Record, error)
 	getRecordsInPurgatory() ([]*pbrc.Record, error)
 	getLibraryRecords() ([]*pbrc.Record, error)
 	getSaleRecords() ([]*pbrc.Record, error)
@@ -91,6 +127,35 @@ func (gh *prodRC) getRecordsInPurgatory() ([]*pbrc.Record, error) {
 	return recs.GetRecords(), nil
 }
 
+func (gh *prodRC) getRecord(instanceID int32) (*pbrc.Record, error) {
+	host, port, err := utils.Resolve("recordcollection")
+
+	if err != nil {
+		return &pbrc.Record{}, err
+	}
+
+	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	defer conn.Close()
+	if err != nil {
+		return &pbrc.Record{}, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client := pbrc.NewRecordCollectionServiceClient(conn)
+	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
+
+	if err != nil {
+		return &pbrc.Record{}, err
+	}
+
+	if len(recs.GetRecords()) == 0 {
+		return &pbrc.Record{}, fmt.Errorf("Record not found")
+	}
+
+	return recs.GetRecords()[0], nil
+}
+
 func (gh *prodRC) getSaleRecords() ([]*pbrc.Record, error) {
 	host, port, err := utils.Resolve("recordcollection")
 
@@ -114,34 +179,6 @@ func (gh *prodRC) getSaleRecords() ([]*pbrc.Record, error) {
 	}
 
 	return recs.GetRecords(), nil
-}
-
-func (gh *prodRC) getRecord(instanceID int32) (*pbrc.Record, error) {
-	host, port, err := utils.Resolve("recordcollection")
-	if err != nil {
-		return &pbrc.Record{}, err
-	}
-
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
-	defer conn.Close()
-	if err != nil {
-		return &pbrc.Record{}, err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
-
-	if err != nil {
-		return &pbrc.Record{}, err
-	}
-
-	if len(recs.GetRecords()) == 0 {
-		return &pbrc.Record{}, fmt.Errorf("No records found %v", instanceID)
-	}
-
-	return recs.GetRecords()[0], nil
 }
 
 type gh interface {
@@ -179,6 +216,7 @@ type Server struct {
 	*goserver.GoServer
 	rc rc
 	gh gh
+	ro ro
 }
 
 // Init builds the server
@@ -186,6 +224,7 @@ func Init() *Server {
 	s := &Server{GoServer: &goserver.GoServer{}}
 	s.gh = &prodGh{}
 	s.rc = &prodRC{}
+	s.ro = &prodRO{}
 	return s
 }
 
