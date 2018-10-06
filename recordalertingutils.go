@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"golang.org/x/net/context"
 )
@@ -60,4 +61,21 @@ func (s *Server) alertForMisorderedMPI(ctx context.Context) {
 		s.gh.alert(nil, fmt.Sprintf("MPI is not ordered correctly!: %v", records))
 	}
 	return
+}
+
+func (s *Server) alertForOldListeningBoxRecord(ctx context.Context) {
+	records, err := s.ro.getLocation("Listening Box")
+	if err == nil {
+		s.Log(fmt.Sprintf("FOUND %v records", len(records.ReleasesLocation)))
+		for _, r := range records.ReleasesLocation {
+			rec, err := s.rc.getRecord(r.InstanceId)
+			s.Log(fmt.Sprintf("Record %v has %v", rec.GetRelease().Title, time.Now().Sub(time.Unix(rec.GetMetadata().DateAdded, 0))))
+			if err == nil && time.Now().Sub(time.Unix(rec.GetMetadata().DateAdded, 0)) > time.Hour*24*30*4 {
+				s.gh.alert(nil, fmt.Sprintf("Record %v has been in the listening box for %v", rec.GetRelease().Title, time.Now().Sub(time.Unix(rec.GetMetadata().DateAdded, 0))))
+			}
+			s.Log(fmt.Sprintf("Error in get record? %v", err))
+		}
+	}
+
+	s.Log(fmt.Sprintf("Error in getLocation? %v", err))
 }
