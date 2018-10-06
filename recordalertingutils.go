@@ -69,7 +69,9 @@ func (s *Server) alertForOldListeningBoxRecord(ctx context.Context) {
 		s.Log(fmt.Sprintf("FOUND %v records", len(records.ReleasesLocation)))
 		for _, r := range records.ReleasesLocation {
 			rec, err := s.rc.getRecord(r.InstanceId)
-			s.Log(fmt.Sprintf("Record %v has %v", rec.GetRelease().Title, time.Now().Sub(time.Unix(rec.GetMetadata().DateAdded, 0))))
+			if err != nil {
+				s.Log(fmt.Sprintf("Record %v has %v", rec.GetRelease().Title, time.Now().Sub(time.Unix(rec.GetMetadata().DateAdded, 0))))
+			}
 			if err == nil && time.Now().Sub(time.Unix(rec.GetMetadata().DateAdded, 0)) > time.Hour*24*30*4 {
 				s.gh.alert(nil, fmt.Sprintf("Record %v has been in the listening box for %v", rec.GetRelease().Title, time.Now().Sub(time.Unix(rec.GetMetadata().DateAdded, 0))))
 			}
