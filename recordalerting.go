@@ -262,6 +262,7 @@ func main() {
 	server.Register = server
 	server.RegisterRepeatingTask(server.alertForPurgatory, "alert_for_purgatory", time.Hour)
 	server.RegisterRepeatingTask(server.alertForMisorderedMPI, "alert_for_misordered_mpi", time.Hour)
+	server.RegisterRepeatingTask(server.alertForOldListeningBoxRecord, "alert_for_old_listening_box_record", time.Hour)
 	server.RegisterServer("recordalerting", false)
 	fmt.Printf("%v", server.Serve())
 }
