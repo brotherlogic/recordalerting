@@ -21,12 +21,12 @@ import (
 )
 
 type ro interface {
-	getLocation(name string) (*pbro.Location, error)
+	getLocation(ctx context.Context, name string) (*pbro.Location, error)
 }
 
 type prodRO struct{}
 
-func (gh *prodRO) getLocation(name string) (*pbro.Location, error) {
+func (gh *prodRO) getLocation(ctx context.Context, name string) (*pbro.Location, error) {
 	host, port, err := utils.Resolve("recordsorganiser")
 
 	if err != nil {
@@ -39,8 +39,6 @@ func (gh *prodRO) getLocation(name string) (*pbro.Location, error) {
 		return &pbro.Location{}, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
 	client := pbro.NewOrganiserServiceClient(conn)
 	resp, err := client.GetOrganisation(ctx, &pbro.GetOrganisationRequest{Locations: []*pbro.Location{&pbro.Location{Name: name}}})
 
@@ -56,15 +54,15 @@ func (gh *prodRO) getLocation(name string) (*pbro.Location, error) {
 }
 
 type rc interface {
-	getRecord(instanceID int32) (*pbrc.Record, error)
-	getRecordsInPurgatory() ([]*pbrc.Record, error)
-	getLibraryRecords() ([]*pbrc.Record, error)
-	getSaleRecords() ([]*pbrc.Record, error)
+	getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error)
+	getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, error)
+	getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
+	getSaleRecords(ctx context.Context) ([]*pbrc.Record, error)
 }
 
 type prodRC struct{}
 
-func (gh *prodRC) getLibraryRecords() ([]*pbrc.Record, error) {
+func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	host, port, err := utils.Resolve("recordsorganiser")
 
 	if err != nil {
@@ -77,8 +75,6 @@ func (gh *prodRC) getLibraryRecords() ([]*pbrc.Record, error) {
 		return []*pbrc.Record{}, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
 	client := pbro.NewOrganiserServiceClient(conn)
 	resp, err := client.GetOrganisation(ctx, &pbro.GetOrganisationRequest{Locations: []*pbro.Location{&pbro.Location{Name: "Library Records"}}})
 
@@ -92,7 +88,7 @@ func (gh *prodRC) getLibraryRecords() ([]*pbrc.Record, error) {
 
 	recs := make([]*pbrc.Record, 0)
 	for _, loc := range resp.GetLocations()[0].GetReleasesLocation() {
-		rec, err := gh.getRecord(loc.GetInstanceId())
+		rec, err := gh.getRecord(ctx, loc.GetInstanceId())
 		if err != nil {
 			return []*pbrc.Record{}, err
 		}
@@ -102,7 +98,7 @@ func (gh *prodRC) getLibraryRecords() ([]*pbrc.Record, error) {
 	return recs, nil
 }
 
-func (gh *prodRC) getRecordsInPurgatory() ([]*pbrc.Record, error) {
+func (gh *prodRC) getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, error) {
 	host, port, err := utils.Resolve("recordcollection")
 
 	if err != nil {
@@ -115,8 +111,6 @@ func (gh *prodRC) getRecordsInPurgatory() ([]*pbrc.Record, error) {
 		return []*pbrc.Record{}, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
 	client := pbrc.NewRecordCollectionServiceClient(conn)
 	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 1362206}}})
 
@@ -127,7 +121,7 @@ func (gh *prodRC) getRecordsInPurgatory() ([]*pbrc.Record, error) {
 	return recs.GetRecords(), nil
 }
 
-func (gh *prodRC) getRecord(instanceID int32) (*pbrc.Record, error) {
+func (gh *prodRC) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
 	host, port, err := utils.Resolve("recordcollection")
 
 	if err != nil {
@@ -140,8 +134,6 @@ func (gh *prodRC) getRecord(instanceID int32) (*pbrc.Record, error) {
 		return &pbrc.Record{}, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
 	client := pbrc.NewRecordCollectionServiceClient(conn)
 	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
 
@@ -156,7 +148,7 @@ func (gh *prodRC) getRecord(instanceID int32) (*pbrc.Record, error) {
 	return recs.GetRecords()[0], nil
 }
 
-func (gh *prodRC) getSaleRecords() ([]*pbrc.Record, error) {
+func (gh *prodRC) getSaleRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	host, port, err := utils.Resolve("recordcollection")
 
 	if err != nil {
@@ -169,8 +161,6 @@ func (gh *prodRC) getSaleRecords() ([]*pbrc.Record, error) {
 		return []*pbrc.Record{}, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
 	client := pbrc.NewRecordCollectionServiceClient(conn)
 	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 488127}}})
 
@@ -182,12 +172,12 @@ func (gh *prodRC) getSaleRecords() ([]*pbrc.Record, error) {
 }
 
 type gh interface {
-	alert(r *pbrc.Record, text string) error
+	alert(ctx context.Context, r *pbrc.Record, text string) error
 }
 
 type prodGh struct{}
 
-func (gh *prodGh) alert(r *pbrc.Record, text string) error {
+func (gh *prodGh) alert(ctx context.Context, r *pbrc.Record, text string) error {
 	host, port, err := utils.Resolve("githubcard")
 
 	if err != nil {
@@ -200,8 +190,6 @@ func (gh *prodGh) alert(r *pbrc.Record, text string) error {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
 	client := pbgh.NewGithubClient(conn)
 	if r != nil {
 		_, err = client.AddIssue(ctx, &pbgh.Issue{Title: "Problematic Record", Body: fmt.Sprintf("%v - %v", text, r.GetRelease().Title), Service: "recordcollection"})
