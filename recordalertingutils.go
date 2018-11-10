@@ -9,6 +9,7 @@ import (
 
 func (s *Server) alertForMissingSaleID(ctx context.Context) {
 	records, err := s.rc.getSaleRecords(ctx)
+	s.Log(fmt.Sprintf("Found %v records for sale", len(records)))
 	if err == nil {
 		for _, r := range records {
 			if r.GetMetadata().SaleId == 0 {

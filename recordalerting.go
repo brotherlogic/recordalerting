@@ -248,6 +248,7 @@ func main() {
 	server := Init()
 	server.PrepServer()
 	server.Register = server
+	server.RegisterRepeatingTask(server.alertForMissingSaleID, "alert_for_missing_sale_id", time.Minute)
 	server.RegisterRepeatingTask(server.alertForPurgatory, "alert_for_purgatory", time.Hour)
 	server.RegisterRepeatingTask(server.alertForMisorderedMPI, "alert_for_misordered_mpi", time.Hour)
 	server.RegisterRepeatingTask(server.alertForOldListeningBoxRecord, "alert_for_old_listening_box_record", time.Hour)
