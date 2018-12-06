@@ -55,7 +55,7 @@ func (gh *prodRO) getLocation(ctx context.Context, name string) (*pbro.Location,
 
 type rc interface {
 	getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error)
-	getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, error)
+	getRecordsInFolder(ctx context.Context, folder int32) ([]*pbrc.Record, error)
 	getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
 	getSaleRecords(ctx context.Context) ([]*pbrc.Record, error)
 }
@@ -63,7 +63,7 @@ type rc interface {
 type prodRC struct{}
 
 func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error) {
-	host, port, err := utils.Resolve("recordsorganiser")
+	host, port, err := utils.Resolve("recordcollection")
 
 	if err != nil {
 		return []*pbrc.Record{}, err
@@ -86,19 +86,24 @@ func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
 		return []*pbrc.Record{}, fmt.Errorf("Too many locations returned: %v", len(resp.GetLocations()))
 	}
 
-	recs := make([]*pbrc.Record, 0)
-	for _, loc := range resp.GetLocations()[0].GetReleasesLocation() {
-		rec, err := gh.getRecord(ctx, loc.GetInstanceId())
-		if err != nil {
-			return []*pbrc.Record{}, err
-		}
-		recs = append(recs, rec)
+	recs, err := gh.getRecordsInFolder(ctx, 529723)
+	if err != nil {
+		return []*pbrc.Record{}, err
+	}
+	recMap := make(map[int32]*pbrc.Record)
+	for _, r := range recs {
+		recMap[r.GetRelease().InstanceId] = r
 	}
 
-	return recs, nil
+	retRecs := make([]*pbrc.Record, 0)
+	for _, loc := range resp.GetLocations()[0].GetReleasesLocation() {
+		recs = append(recs, recMap[loc.InstanceId])
+	}
+
+	return retRecs, nil
 }
 
-func (gh *prodRC) getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, error) {
+func (gh *prodRC) getRecordsInFolder(ctx context.Context, folder int32) ([]*pbrc.Record, error) {
 	host, port, err := utils.Resolve("recordcollection")
 
 	if err != nil {
@@ -112,7 +117,7 @@ func (gh *prodRC) getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, er
 	}
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 1362206}}})
+	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: folder}}})
 
 	if err != nil {
 		return []*pbrc.Record{}, err

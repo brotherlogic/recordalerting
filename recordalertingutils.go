@@ -20,7 +20,7 @@ func (s *Server) alertForMissingSaleID(ctx context.Context) {
 }
 
 func (s *Server) alertForPurgatory(ctx context.Context) {
-	records, err := s.rc.getRecordsInPurgatory(ctx)
+	records, err := s.rc.getRecordsInFolder(ctx, 1362206)
 	if err == nil {
 		if len(records) > 0 {
 			for _, r := range records {
