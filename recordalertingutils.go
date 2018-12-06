@@ -25,7 +25,7 @@ func (s *Server) alertForPurgatory(ctx context.Context) {
 		if len(records) > 0 {
 			for _, r := range records {
 				if !r.GetMetadata().GetDirty() {
-					s.gh.alert(ctx, records[0], fmt.Sprintf("%v is in Purgatory!", records[0].GetRelease().Title))
+					s.gh.alert(ctx, records[0], fmt.Sprintf("[%v]. %v is in Purgatory!", records[0].GetRelease().Id, records[0].GetRelease().Title))
 					break
 				}
 			}
