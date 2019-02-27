@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"strconv"
 	"time"
 
 	"github.com/brotherlogic/goserver"
@@ -15,7 +14,6 @@ import (
 	pbgh "github.com/brotherlogic/githubcard/proto"
 	pbgd "github.com/brotherlogic/godiscogs"
 	pbg "github.com/brotherlogic/goserver/proto"
-	"github.com/brotherlogic/goserver/utils"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 	pbro "github.com/brotherlogic/recordsorganiser/proto"
 )
@@ -24,20 +22,16 @@ type ro interface {
 	getLocation(ctx context.Context, name string) (*pbro.Location, error)
 }
 
-type prodRO struct{}
+type prodRO struct {
+	dial func(server string) (*grpc.ClientConn, error)
+}
 
 func (gh *prodRO) getLocation(ctx context.Context, name string) (*pbro.Location, error) {
-	host, port, err := utils.Resolve("recordsorganiser")
-
+	conn, err := gh.dial("recordsorganiser")
 	if err != nil {
 		return &pbro.Location{}, err
 	}
-
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
-	if err != nil {
-		return &pbro.Location{}, err
-	}
 
 	client := pbro.NewOrganiserServiceClient(conn)
 	resp, err := client.GetOrganisation(ctx, &pbro.GetOrganisationRequest{Locations: []*pbro.Location{&pbro.Location{Name: name}}})
@@ -60,20 +54,16 @@ type rc interface {
 	getSaleRecords(ctx context.Context) ([]*pbrc.Record, error)
 }
 
-type prodRC struct{}
+type prodRC struct {
+	dial func(server string) (*grpc.ClientConn, error)
+}
 
 func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error) {
-	host, port, err := utils.Resolve("recordsorganiser")
-
+	conn, err := gh.dial("recordsorganiser")
 	if err != nil {
 		return []*pbrc.Record{}, err
 	}
-
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
-	if err != nil {
-		return []*pbrc.Record{}, err
-	}
 
 	client := pbro.NewOrganiserServiceClient(conn)
 	resp, err := client.GetOrganisation(ctx, &pbro.GetOrganisationRequest{Locations: []*pbro.Location{&pbro.Location{Name: "Library Records"}}})
@@ -99,17 +89,11 @@ func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
 }
 
 func (gh *prodRC) getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, error) {
-	host, port, err := utils.Resolve("recordcollection")
-
+	conn, err := gh.dial("recordcollection")
 	if err != nil {
 		return []*pbrc.Record{}, err
 	}
-
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
-	if err != nil {
-		return []*pbrc.Record{}, err
-	}
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
 	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 1362206}}})
@@ -122,17 +106,11 @@ func (gh *prodRC) getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, er
 }
 
 func (gh *prodRC) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
-	host, port, err := utils.Resolve("recordcollection")
-
+	conn, err := gh.dial("recordcollection")
 	if err != nil {
 		return &pbrc.Record{}, err
 	}
-
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
-	if err != nil {
-		return &pbrc.Record{}, err
-	}
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
 	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
@@ -149,17 +127,11 @@ func (gh *prodRC) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record
 }
 
 func (gh *prodRC) getSaleRecords(ctx context.Context) ([]*pbrc.Record, error) {
-	host, port, err := utils.Resolve("recordcollection")
-
+	conn, err := gh.dial("recordcollection")
 	if err != nil {
 		return []*pbrc.Record{}, err
 	}
-
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
-	if err != nil {
-		return []*pbrc.Record{}, err
-	}
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
 	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 488127}}})
@@ -175,20 +147,16 @@ type gh interface {
 	alert(ctx context.Context, r *pbrc.Record, text string) error
 }
 
-type prodGh struct{}
+type prodGh struct {
+	dial func(server string) (*grpc.ClientConn, error)
+}
 
 func (gh *prodGh) alert(ctx context.Context, r *pbrc.Record, text string) error {
-	host, port, err := utils.Resolve("githubcard")
-
+	conn, err := gh.dial("githubcard")
 	if err != nil {
 		return err
 	}
-
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
-	if err != nil {
-		return err
-	}
 
 	client := pbgh.NewGithubClient(conn)
 	if r != nil {
@@ -210,9 +178,9 @@ type Server struct {
 // Init builds the server
 func Init() *Server {
 	s := &Server{GoServer: &goserver.GoServer{}}
-	s.gh = &prodGh{}
-	s.rc = &prodRC{}
-	s.ro = &prodRO{}
+	s.gh = &prodGh{s.DialMaster}
+	s.rc = &prodRC{s.DialMaster}
+	s.ro = &prodRO{s.DialMaster}
 	return s
 }
 
