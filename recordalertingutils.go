@@ -7,7 +7,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (s *Server) alertForMissingSaleID(ctx context.Context) {
+func (s *Server) alertForMissingSaleID(ctx context.Context) error {
 	records, err := s.rc.getSaleRecords(ctx)
 	s.Log(fmt.Sprintf("Found %v records for sale", len(records)))
 	if err == nil {
@@ -17,9 +17,10 @@ func (s *Server) alertForMissingSaleID(ctx context.Context) {
 			}
 		}
 	}
+	return nil
 }
 
-func (s *Server) alertForPurgatory(ctx context.Context) {
+func (s *Server) alertForPurgatory(ctx context.Context) error {
 	records, err := s.rc.getRecordsInPurgatory(ctx)
 	if err == nil {
 		if len(records) > 0 {
@@ -33,14 +34,16 @@ func (s *Server) alertForPurgatory(ctx context.Context) {
 	} else {
 		s.Log(fmt.Sprintf("Error getting records: %v", err))
 	}
+
+	return nil
 }
 
-func (s *Server) alertForMisorderedMPI(ctx context.Context) {
+func (s *Server) alertForMisorderedMPI(ctx context.Context) error {
 	records, err := s.rc.getLibraryRecords(ctx)
 
 	if err != nil {
 		s.Log(fmt.Sprintf("Error getting library records: %v", err))
-		return
+		return err
 	}
 
 	order := []string{"Jazz Moderne", "Action Charme Espace", "Paysages, Evasion, Melancolie", "Sports Et Action"}
@@ -61,10 +64,10 @@ func (s *Server) alertForMisorderedMPI(ctx context.Context) {
 	if fail {
 		s.gh.alert(ctx, nil, fmt.Sprintf("MPI is not ordered correctly!: %v", records))
 	}
-	return
+	return nil
 }
 
-func (s *Server) alertForOldListeningBoxRecord(ctx context.Context) {
+func (s *Server) alertForOldListeningBoxRecord(ctx context.Context) error {
 	records, err := s.ro.getLocation(ctx, "Listening Box")
 	if err == nil {
 		s.Log(fmt.Sprintf("FOUND %v records", len(records.ReleasesLocation)))
@@ -80,5 +83,5 @@ func (s *Server) alertForOldListeningBoxRecord(ctx context.Context) {
 		}
 	}
 
-	s.Log(fmt.Sprintf("Error in getLocation? %v", err))
+	return err
 }
