@@ -85,3 +85,22 @@ func (s *Server) alertForOldListeningBoxRecord(ctx context.Context) error {
 
 	return err
 }
+
+func (s *Server) alertForOldListeningPileRecord(ctx context.Context) error {
+	records, err := s.ro.getLocation(ctx, "Listening Pile")
+	if err != nil {
+		return err
+	}
+
+	for _, r := range records.ReleasesLocation {
+		rec, err := s.rc.getRecord(ctx, r.InstanceId)
+		if err != nil {
+			return err
+		}
+		if time.Now().Sub(time.Unix(rec.GetMetadata().LastMoveTime, 0)) > time.Hour*24*30 {
+			s.gh.alert(ctx, nil, fmt.Sprintf("Record %v has been in the listening box for %v", rec.GetRelease().Title, time.Now().Sub(time.Unix(rec.GetMetadata().LastMoveTime, 0))))
+		}
+	}
+
+	return nil
+}
