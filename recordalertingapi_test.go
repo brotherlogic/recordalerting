@@ -14,7 +14,7 @@ type testRo struct {
 }
 
 func (t *testRo) getLocation(ctx context.Context, name string) (*pbro.Location, error) {
-	if name == "Listening Box" {
+	if name == "Listening Box" || name == "Listening Pile" {
 		return &pbro.Location{ReleasesLocation: []*pbro.ReleasePlacement{&pbro.ReleasePlacement{InstanceId: 1234}}}, nil
 	}
 	return nil, fmt.Errorf("Unknown Location")
