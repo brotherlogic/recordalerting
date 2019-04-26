@@ -124,3 +124,15 @@ func TestOldListeningBox(t *testing.T) {
 		t.Errorf("No errors have been sent!")
 	}
 }
+
+func TestOldListeningPile(t *testing.T) {
+	s := InitTest()
+	gh := &testGh{}
+	s.gh = gh
+
+	s.alertForOldListeningPileRecord(context.Background())
+
+	if gh.count == 0 {
+		t.Errorf("No errors have been sent!")
+	}
+}

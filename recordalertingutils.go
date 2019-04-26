@@ -98,7 +98,7 @@ func (s *Server) alertForOldListeningPileRecord(ctx context.Context) error {
 			return err
 		}
 		if time.Now().Sub(time.Unix(rec.GetMetadata().LastMoveTime, 0)) > time.Hour*24*30 {
-			s.gh.alert(ctx, nil, fmt.Sprintf("Record %v has been in the listening box for %v", rec.GetRelease().Title, time.Now().Sub(time.Unix(rec.GetMetadata().LastMoveTime, 0))))
+			s.gh.alert(ctx, nil, fmt.Sprintf("Record %v has been in the listening pile for %v", rec.GetRelease().Title, time.Now().Sub(time.Unix(rec.GetMetadata().LastMoveTime, 0))))
 		}
 	}
 
