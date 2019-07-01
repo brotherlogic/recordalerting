@@ -152,7 +152,7 @@ func (gh *prodRC) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{}}})
+	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{}}}, grpc.MaxCallRecvMsgSize(1024*1024*1024))
 
 	if err != nil {
 		return []*pbrc.Record{}, err
