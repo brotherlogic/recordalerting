@@ -11,9 +11,13 @@ import (
 )
 
 type testRo struct {
+	fail bool
 }
 
 func (t *testRo) getLocation(ctx context.Context, name string) (*pbro.Location, error) {
+	if t.fail {
+		return nil, fmt.Errorf("Built to fail")
+	}
 	if name == "Listening Box" || name == "Listening Pile" {
 		return &pbro.Location{ReleasesLocation: []*pbro.ReleasePlacement{&pbro.ReleasePlacement{InstanceId: 1234}}}, nil
 	}
@@ -37,9 +41,13 @@ type testRc struct {
 	fail    bool
 	order   bool
 	missing bool
+	failAll bool
 }
 
 func (rc *testRc) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
+	if rc.fail {
+		return nil, fmt.Errorf("Built to fail")
+	}
 	if instanceID == 1234 {
 		return &pbrc.Record{Release: &pbgd.Release{Title: "Madeup"}, Metadata: &pbrc.ReleaseMetadata{DateAdded: 1234}}, nil
 	}
@@ -48,6 +56,13 @@ func (rc *testRc) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record
 
 func (rc *testRc) getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, error) {
 	if rc.fail {
+		return []*pbrc.Record{}, fmt.Errorf("Built to fail")
+	}
+	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}, Metadata: &pbrc.ReleaseMetadata{}}}, nil
+}
+
+func (rc *testRc) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
+	if rc.failAll {
 		return []*pbrc.Record{}, fmt.Errorf("Built to fail")
 	}
 	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}, Metadata: &pbrc.ReleaseMetadata{}}}, nil

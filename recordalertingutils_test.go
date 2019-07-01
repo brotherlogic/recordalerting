@@ -136,3 +136,46 @@ func TestOldListeningPile(t *testing.T) {
 		t.Errorf("No errors have been sent!")
 	}
 }
+
+func TestOldListeningPileFailRO(t *testing.T) {
+	s := InitTest()
+	s.ro = &testRo{fail: true}
+
+	err := s.alertForOldListeningPileRecord(context.Background())
+
+	if err == nil {
+		t.Errorf("Did not error")
+	}
+}
+
+func TestOldListeningPileFailRC(t *testing.T) {
+	s := InitTest()
+	s.rc = &testRc{fail: true}
+
+	err := s.alertForOldListeningPileRecord(context.Background())
+
+	if err == nil {
+		t.Errorf("Did not error")
+	}
+}
+
+func TestInvalid(t *testing.T) {
+	s := InitTest()
+
+	s.validateRecords(context.Background())
+
+	if s.invalidRecords == 0 {
+		t.Errorf("No invalidation")
+	}
+}
+
+func TestInvalidFail(t *testing.T) {
+	s := InitTest()
+	s.rc = &testRc{failAll: true}
+
+	err := s.validateRecords(context.Background())
+
+	if err == nil {
+		t.Errorf("Did not error")
+	}
+}
