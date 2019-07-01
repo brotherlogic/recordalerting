@@ -52,6 +52,7 @@ type rc interface {
 	getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, error)
 	getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
 	getSaleRecords(ctx context.Context) ([]*pbrc.Record, error)
+	getRecords(ctx context.Context) ([]*pbrc.Record, error)
 }
 
 type prodRC struct {
@@ -143,6 +144,23 @@ func (gh *prodRC) getSaleRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	return recs.GetRecords(), nil
 }
 
+func (gh *prodRC) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
+	conn, err := gh.dial("recordcollection")
+	if err != nil {
+		return []*pbrc.Record{}, err
+	}
+	defer conn.Close()
+
+	client := pbrc.NewRecordCollectionServiceClient(conn)
+	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{}}})
+
+	if err != nil {
+		return []*pbrc.Record{}, err
+	}
+
+	return recs.GetRecords(), nil
+}
+
 type gh interface {
 	alert(ctx context.Context, r *pbrc.Record, text string) error
 }
@@ -170,9 +188,10 @@ func (gh *prodGh) alert(ctx context.Context, r *pbrc.Record, text string) error 
 //Server main server type
 type Server struct {
 	*goserver.GoServer
-	rc rc
-	gh gh
-	ro ro
+	rc             rc
+	gh             gh
+	ro             ro
+	invalidRecords int
 }
 
 // Init builds the server
@@ -226,6 +245,7 @@ func main() {
 	server.RegisterRepeatingTask(server.alertForMisorderedMPI, "alert_for_misordered_mpi", time.Hour)
 	server.RegisterRepeatingTask(server.alertForOldListeningBoxRecord, "alert_for_old_listening_box_record", time.Hour)
 	server.RegisterRepeatingTask(server.alertForOldListeningPileRecord, "alert_for_old_listening_pile_record", time.Hour)
+	server.RegisterRepeatingTask(server.validateRecords, "validate_records", time.Minute)
 	server.RegisterServer("recordalerting", false)
 	fmt.Printf("%v", server.Serve())
 }

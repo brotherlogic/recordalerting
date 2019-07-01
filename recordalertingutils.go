@@ -7,6 +7,20 @@ import (
 	"golang.org/x/net/context"
 )
 
+func (s *Server) validateRecords(ctx context.Context) error {
+	records, err := s.rc.getRecords(ctx)
+	if err != nil {
+		return err
+	}
+	for _, r := range records {
+		if r.GetMetadata().GoalFolder == 0 {
+			s.RaiseIssue(ctx, "Invalid Record", fmt.Sprintf("%v has no goal folder", r.GetRelease().InstanceId), false)
+			s.invalidRecords++
+		}
+	}
+	return nil
+}
+
 func (s *Server) alertForMissingSaleID(ctx context.Context) error {
 	records, err := s.rc.getSaleRecords(ctx)
 	s.Log(fmt.Sprintf("Found %v records for sale", len(records)))
