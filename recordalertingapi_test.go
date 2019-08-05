@@ -65,7 +65,7 @@ func (rc *testRc) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	if rc.failAll {
 		return []*pbrc.Record{}, fmt.Errorf("Built to fail")
 	}
-	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}, Metadata: &pbrc.ReleaseMetadata{}}}, nil
+	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp", FolderId: 812802}, Metadata: &pbrc.ReleaseMetadata{}}}, nil
 }
 
 func (rc *testRc) getSaleRecords(ctx context.Context) ([]*pbrc.Record, error) {
