@@ -179,3 +179,14 @@ func TestInvalidFail(t *testing.T) {
 		t.Errorf("Did not error")
 	}
 }
+
+func TestInvalidFailQuery(t *testing.T) {
+	s := InitTest()
+	s.rc = &testRc{fail: true}
+
+	err := s.validateRecords(context.Background())
+
+	if err == nil {
+		t.Errorf("Did not error")
+	}
+}

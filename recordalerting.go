@@ -53,6 +53,7 @@ type rc interface {
 	getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
 	getSaleRecords(ctx context.Context) ([]*pbrc.Record, error)
 	getRecords(ctx context.Context) ([]*pbrc.Record, error)
+	getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error)
 }
 
 type prodRC struct {
@@ -125,6 +126,23 @@ func (gh *prodRC) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record
 	}
 
 	return recs.GetRecords()[0], nil
+}
+
+func (gh *prodRC) getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error) {
+	conn, err := gh.dial("recordcollection")
+	if err != nil {
+		return []int32{}, err
+	}
+	defer conn.Close()
+
+	client := pbrc.NewRecordCollectionServiceClient(conn)
+	recs, err := client.QueryRecords(ctx, &pbrc.QueryRecordsRequest{Query: &pbrc.QueryRecordsRequest_FolderId{folder}})
+
+	if err != nil {
+		return []int32{}, err
+	}
+
+	return recs.GetInstanceIds(), nil
 }
 
 func (gh *prodRC) getSaleRecords(ctx context.Context) ([]*pbrc.Record, error) {

@@ -8,18 +8,22 @@ import (
 )
 
 func (s *Server) validateRecords(ctx context.Context) error {
-	records, err := s.rc.getRecords(ctx)
+	records, err := s.rc.getRecordsInFolder(ctx, 812802)
 	if err != nil {
 		return err
 	}
 	missingCondition := []int32{}
-	for _, r := range records {
+	for _, id := range records {
+		r, err := s.rc.getRecord(ctx, id)
+		if err != nil {
+			return err
+		}
 		if r.GetMetadata().GoalFolder == 0 {
 			s.RaiseIssue(ctx, "Invalid Record", fmt.Sprintf("%v has no goal folder", r.GetRelease().InstanceId), false)
 			s.invalidRecords++
 		}
 
-		if r.GetRelease().FolderId == 812802 && (len(r.GetRelease().RecordCondition) == 0 || len(r.GetRelease().SleeveCondition) == 0) {
+		if len(r.GetRelease().RecordCondition) == 0 || len(r.GetRelease().SleeveCondition) == 0 {
 			missingCondition = append(missingCondition, r.GetRelease().Id)
 		}
 	}
