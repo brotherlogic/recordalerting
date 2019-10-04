@@ -45,7 +45,7 @@ type testRc struct {
 }
 
 func (rc *testRc) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
-	if rc.fail {
+	if rc.fail || rc.failAll {
 		return nil, fmt.Errorf("Built to fail")
 	}
 	if instanceID == 1234 {
@@ -59,6 +59,13 @@ func (rc *testRc) getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, er
 		return []*pbrc.Record{}, fmt.Errorf("Built to fail")
 	}
 	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}, Metadata: &pbrc.ReleaseMetadata{}}}, nil
+}
+
+func (rc *testRc) getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error) {
+	if rc.fail {
+		return []int32{}, fmt.Errorf("Built to fail")
+	}
+	return []int32{1234}, nil
 }
 
 func (rc *testRc) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
