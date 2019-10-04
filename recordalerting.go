@@ -97,7 +97,7 @@ func (gh *prodRC) getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, er
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 1362206}}})
+	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "purg-alerting", Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 1362206}}})
 
 	if err != nil {
 		return []*pbrc.Record{}, err
@@ -114,7 +114,7 @@ func (gh *prodRC) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
+	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "alerting-getRecord", Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
 
 	if err != nil {
 		return &pbrc.Record{}, err
@@ -135,7 +135,7 @@ func (gh *prodRC) getSaleRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 488127}}})
+	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "alerting-getsalerecords", Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 488127}}})
 
 	if err != nil {
 		return []*pbrc.Record{}, err
@@ -152,7 +152,7 @@ func (gh *prodRC) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{}}}, grpc.MaxCallRecvMsgSize(1024*1024*1024))
+	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "alerting-getrecords", Filter: &pbrc.Record{Release: &pbgd.Release{}}}, grpc.MaxCallRecvMsgSize(1024*1024*1024))
 
 	if err != nil {
 		return []*pbrc.Record{}, err
