@@ -110,22 +110,18 @@ func (gh *prodRC) getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, er
 func (gh *prodRC) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
 	conn, err := gh.dial("recordcollection")
 	if err != nil {
-		return &pbrc.Record{}, err
+		return nil, err
 	}
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "alerting-getRecord", Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
+	recs, err := client.GetRecord(ctx, &pbrc.GetRecordRequest{InstanceId: instanceID})
 
 	if err != nil {
-		return &pbrc.Record{}, err
+		return nil, err
 	}
 
-	if len(recs.GetRecords()) == 0 {
-		return &pbrc.Record{}, fmt.Errorf("Record with id %v not found", instanceID)
-	}
-
-	return recs.GetRecords()[0], nil
+	return recs.GetRecord(), nil
 }
 
 func (gh *prodRC) getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error) {
