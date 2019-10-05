@@ -122,7 +122,7 @@ func (gh *prodRC) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record
 	}
 
 	if len(recs.GetRecords()) == 0 {
-		return &pbrc.Record{}, fmt.Errorf("Record not found")
+		return &pbrc.Record{}, fmt.Errorf("Record with id %v not found", instanceID)
 	}
 
 	return recs.GetRecords()[0], nil
