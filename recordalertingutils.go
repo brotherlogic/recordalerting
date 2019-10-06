@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
+
+	pbrc "github.com/brotherlogic/recordcollection/proto"
 )
 
 func (s *Server) validateRecords(ctx context.Context) error {
@@ -40,7 +42,7 @@ func (s *Server) alertForMissingSaleID(ctx context.Context) error {
 	s.Log(fmt.Sprintf("Found %v records for sale", len(records)))
 	if err == nil {
 		for _, r := range records {
-			if r.GetMetadata().SaleId == 0 {
+			if r.GetMetadata().SaleId == 0 && r.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
 				s.gh.alert(ctx, r, fmt.Sprintf("%v (%v) is missing the sale id", r.GetRelease().Id, r.GetRelease().InstanceId))
 			}
 		}
