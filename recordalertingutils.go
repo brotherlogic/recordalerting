@@ -26,7 +26,7 @@ func (s *Server) validateRecords(ctx context.Context) error {
 		}
 
 		if len(r.GetRelease().RecordCondition) == 0 || len(r.GetRelease().SleeveCondition) == 0 {
-			missingCondition = append(missingCondition, r.GetRelease().Id)
+			missingCondition = append(missingCondition, r.GetRelease().InstanceId)
 		}
 	}
 
