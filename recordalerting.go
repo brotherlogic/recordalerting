@@ -12,7 +12,6 @@ import (
 	"google.golang.org/grpc"
 
 	pbgh "github.com/brotherlogic/githubcard/proto"
-	pbgd "github.com/brotherlogic/godiscogs"
 	pbg "github.com/brotherlogic/goserver/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 	pbro "github.com/brotherlogic/recordsorganiser/proto"
@@ -49,15 +48,29 @@ func (gh *prodRO) getLocation(ctx context.Context, name string) (*pbro.Location,
 
 type rc interface {
 	getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error)
-	getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, error)
 	getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
-	getSaleRecords(ctx context.Context) ([]*pbrc.Record, error)
-	getRecords(ctx context.Context) ([]*pbrc.Record, error)
 	getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error)
 }
 
 type prodRC struct {
 	dial func(server string) (*grpc.ClientConn, error)
+}
+
+func (gh *prodRC) getRecord(ctx context.Context, i int32) (*pbrc.Record, error) {
+	conn, err := gh.dial("recordcollection")
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := pbrc.NewRecordCollectionServiceClient(conn)
+	recs, err := client.GetRecord(ctx, &pbrc.GetRecordRequest{InstanceId: i})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return recs.GetRecord(), nil
 }
 
 func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error) {
@@ -90,40 +103,6 @@ func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
 	return recs, nil
 }
 
-func (gh *prodRC) getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, error) {
-	conn, err := gh.dial("recordcollection")
-	if err != nil {
-		return []*pbrc.Record{}, err
-	}
-	defer conn.Close()
-
-	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "purg-alerting", Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 1362206}}})
-
-	if err != nil {
-		return []*pbrc.Record{}, err
-	}
-
-	return recs.GetRecords(), nil
-}
-
-func (gh *prodRC) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
-	conn, err := gh.dial("recordcollection")
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-
-	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecord(ctx, &pbrc.GetRecordRequest{InstanceId: instanceID})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return recs.GetRecord(), nil
-}
-
 func (gh *prodRC) getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error) {
 	conn, err := gh.dial("recordcollection")
 	if err != nil {
@@ -139,40 +118,6 @@ func (gh *prodRC) getRecordsInFolder(ctx context.Context, folder int32) ([]int32
 	}
 
 	return recs.GetInstanceIds(), nil
-}
-
-func (gh *prodRC) getSaleRecords(ctx context.Context) ([]*pbrc.Record, error) {
-	conn, err := gh.dial("recordcollection")
-	if err != nil {
-		return []*pbrc.Record{}, err
-	}
-	defer conn.Close()
-
-	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "alerting-getsalerecords", Filter: &pbrc.Record{Release: &pbgd.Release{FolderId: 488127}}})
-
-	if err != nil {
-		return []*pbrc.Record{}, err
-	}
-
-	return recs.GetRecords(), nil
-}
-
-func (gh *prodRC) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
-	conn, err := gh.dial("recordcollection")
-	if err != nil {
-		return []*pbrc.Record{}, err
-	}
-	defer conn.Close()
-
-	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "alerting-getrecords", Filter: &pbrc.Record{Release: &pbgd.Release{}}}, grpc.MaxCallRecvMsgSize(1024*1024*1024))
-
-	if err != nil {
-		return []*pbrc.Record{}, err
-	}
-
-	return recs.GetRecords(), nil
 }
 
 type gh interface {

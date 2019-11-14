@@ -49,7 +49,7 @@ func (rc *testRc) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record
 		return nil, fmt.Errorf("Built to fail")
 	}
 	if instanceID == 1234 {
-		return &pbrc.Record{Release: &pbgd.Release{Title: "Madeup"}, Metadata: &pbrc.ReleaseMetadata{DateAdded: 1234}}, nil
+		return &pbrc.Record{Release: &pbgd.Release{Title: "Madeup"}, Metadata: &pbrc.ReleaseMetadata{DateAdded: 1234, Category: pbrc.ReleaseMetadata_LISTED_TO_SELL}}, nil
 	}
 	return nil, fmt.Errorf("Unknown record")
 }
