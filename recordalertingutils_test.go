@@ -9,6 +9,7 @@ import (
 func TestNoSale(t *testing.T) {
 	s := Init()
 	s.SkipLog = true
+	s.SkipIssue = true
 	gh := &testGh{}
 	s.rc = &testRc{}
 	s.gh = gh
@@ -16,13 +17,14 @@ func TestNoSale(t *testing.T) {
 	s.alertForMissingSaleID(context.Background())
 
 	if gh.count == 0 {
-		t.Errorf("No errors sent!")
+		t.Errorf("No errors sent!: %v", gh.count)
 	}
 }
 
 func TestPurgatory(t *testing.T) {
 	s := Init()
 	s.SkipLog = true
+	s.SkipIssue = true
 	gh := &testGh{}
 	s.rc = &testRc{}
 	s.gh = gh
@@ -37,6 +39,7 @@ func TestPurgatory(t *testing.T) {
 func TestPurgatoryFail(t *testing.T) {
 	s := Init()
 	s.SkipLog = true
+	s.SkipIssue = true
 	gh := &testGh{}
 	s.rc = &testRc{fail: true}
 	s.gh = gh
@@ -51,6 +54,7 @@ func TestPurgatoryFail(t *testing.T) {
 func TestMPI(t *testing.T) {
 	s := Init()
 	s.SkipLog = true
+	s.SkipIssue = true
 	gh := &testGh{}
 	s.rc = &testRc{}
 	s.gh = gh
@@ -65,6 +69,7 @@ func TestMPI(t *testing.T) {
 func TestMPIFail(t *testing.T) {
 	s := Init()
 	s.SkipLog = true
+	s.SkipIssue = true
 	gh := &testGh{}
 	s.rc = &testRc{fail: true}
 	s.gh = gh
@@ -78,6 +83,7 @@ func TestMPIFail(t *testing.T) {
 func TestMPIOrder(t *testing.T) {
 	s := Init()
 	s.SkipLog = true
+	s.SkipIssue = true
 	gh := &testGh{}
 	s.rc = &testRc{order: true}
 	s.gh = gh
@@ -92,6 +98,7 @@ func TestMPIOrder(t *testing.T) {
 func TestMPIMissing(t *testing.T) {
 	s := Init()
 	s.SkipLog = true
+	s.SkipIssue = true
 	gh := &testGh{}
 	s.rc = &testRc{missing: true}
 	s.gh = gh
@@ -106,6 +113,7 @@ func TestMPIMissing(t *testing.T) {
 func InitTest() *Server {
 	s := Init()
 	s.SkipLog = true
+	s.SkipIssue = true
 	s.gh = &testGh{}
 	s.rc = &testRc{}
 	s.ro = &testRo{}

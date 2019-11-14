@@ -38,10 +38,11 @@ func (s *Server) validateRecords(ctx context.Context) error {
 }
 
 func (s *Server) alertForMissingSaleID(ctx context.Context) error {
-	records, err := s.rc.getSaleRecords(ctx)
+	records, err := s.rc.getRecordsInFolder(ctx, 488127)
 	s.Log(fmt.Sprintf("Found %v records for sale", len(records)))
 	if err == nil {
-		for _, r := range records {
+		for _, record := range records {
+			r, _ := s.rc.getRecord(ctx, record)
 			if r.GetMetadata().SaleId == 0 && r.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
 				s.gh.alert(ctx, r, fmt.Sprintf("%v (%v) is missing the sale id", r.GetRelease().Id, r.GetRelease().InstanceId))
 			}
@@ -51,12 +52,13 @@ func (s *Server) alertForMissingSaleID(ctx context.Context) error {
 }
 
 func (s *Server) alertForPurgatory(ctx context.Context) error {
-	records, err := s.rc.getRecordsInPurgatory(ctx)
+	records, err := s.rc.getRecordsInFolder(ctx, 1362206)
 	if err == nil {
 		if len(records) > 0 {
-			for _, r := range records {
+			for _, record := range records {
+				r, _ := s.rc.getRecord(ctx, record)
 				if !r.GetMetadata().GetDirty() {
-					s.gh.alert(ctx, records[0], fmt.Sprintf("[%v]. %v is in Purgatory!", records[0].GetRelease().Id, records[0].GetRelease().Title))
+					s.gh.alert(ctx, r, fmt.Sprintf("[%v]. %v is in Purgatory!", r.GetRelease().Id, r.GetRelease().Title))
 					break
 				}
 			}
