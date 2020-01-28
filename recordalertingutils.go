@@ -114,7 +114,7 @@ func (s *Server) alertForOldListeningBoxRecord(ctx context.Context) error {
 				s.Log(fmt.Sprintf("Record %v has %v", rec.GetRelease().Title, time.Now().Sub(time.Unix(rec.GetMetadata().DateAdded, 0))))
 			}
 			if err == nil && time.Now().Sub(time.Unix(rec.GetMetadata().DateAdded, 0)) > time.Hour*24*30*4 {
-				s.gh.alert(ctx, nil, fmt.Sprintf("Record %v has been in the listening box for %v", rec.GetRelease().Title, time.Now().Sub(time.Unix(rec.GetMetadata().DateAdded, 0))))
+				s.gh.alert(ctx, nil, fmt.Sprintf("Record %v [%v] has been in the listening box for %v", rec.GetRelease().Title, rec.GetRelease().GetInstanceId(), time.Now().Sub(time.Unix(rec.GetMetadata().DateAdded, 0))))
 			}
 			s.Log(fmt.Sprintf("Error in get record? %v", err))
 		}
