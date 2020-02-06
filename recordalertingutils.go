@@ -42,18 +42,20 @@ func (s *Server) alertForMissingSaleID(ctx context.Context) error {
 	s.Log(fmt.Sprintf("Found %v records for sale", len(records)))
 	if err == nil {
 		for _, record := range records {
-			r, _ := s.rc.getRecord(ctx, record)
-			if r.GetMetadata().SaleId == 0 && r.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
-				s.gh.alert(ctx, r, fmt.Sprintf("%v (%v) is missing the sale id", r.GetRelease().Id, r.GetRelease().InstanceId))
-			}
+			r, err := s.rc.getRecord(ctx, record)
+			if err == nil {
+				if r.GetMetadata().SaleId == 0 && r.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
+					s.gh.alert(ctx, r, fmt.Sprintf("%v (%v) is missing the sale id", r.GetRelease().Id, r.GetRelease().InstanceId))
+				}
 
-			//Also validate the current sale price
-			if time.Now().Sub(time.Unix(r.GetMetadata().GetSalePriceUpdate(), 0)) > time.Hour*24*7 {
-				s.gh.alert(ctx, r, fmt.Sprintf("%v (%v) has not had a sale price update since %v", r.GetRelease().Id, r.GetRelease().InstanceId, time.Unix(r.GetMetadata().GetSalePriceUpdate(), 0)))
+				//Also validate the current sale price
+				if time.Now().Sub(time.Unix(r.GetMetadata().GetSalePriceUpdate(), 0)) > time.Hour*24*7 {
+					s.gh.alert(ctx, r, fmt.Sprintf("%v (%v) has not had a sale price update since %v", r.GetRelease().Id, r.GetRelease().InstanceId, time.Unix(r.GetMetadata().GetSalePriceUpdate(), 0)))
+				}
 			}
 		}
 	}
-	return nil
+	return err
 }
 
 func (s *Server) alertForPurgatory(ctx context.Context) error {
