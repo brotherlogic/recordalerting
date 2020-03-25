@@ -44,7 +44,7 @@ func (s *Server) alertForMissingSaleID(ctx context.Context) error {
 		for _, record := range records {
 			r, err := s.rc.getRecord(ctx, record)
 			if err == nil {
-				if r.GetMetadata().SaleId == 0 && r.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
+				if r.GetMetadata().SaleId <= 0 && r.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
 					s.gh.alert(ctx, r, fmt.Sprintf("%v (%v) is missing the sale id", r.GetRelease().Id, r.GetRelease().InstanceId))
 				}
 
