@@ -25,7 +25,7 @@ func (s *Server) validateRecords(ctx context.Context) error {
 			s.invalidRecords++
 		}
 
-		if len(r.GetRelease().RecordCondition) == 0 || len(r.GetRelease().SleeveCondition) == 0 {
+		if len(r.GetRelease().RecordCondition) == 0 || len(r.GetRelease().SleeveCondition) == 0 && r.GetMetadata().GetGoalFolder() != 1782105 {
 			missingCondition = append(missingCondition, r.GetRelease().Id)
 		}
 	}
