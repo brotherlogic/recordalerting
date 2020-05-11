@@ -28,6 +28,10 @@ func (s *Server) validateRecords(ctx context.Context) error {
 		if (len(r.GetRelease().RecordCondition) == 0 || len(r.GetRelease().SleeveCondition) == 0) && r.GetMetadata().GetGoalFolder() != 1782105 {
 			missingCondition = append(missingCondition, r.GetRelease().Id)
 		}
+
+		if r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_PURCHASED && time.Now().Sub(time.Unix(r.GetMetadata().GetLastUpdateTime(), 0)) > time.Hour*24 {
+			s.RaiseIssue(ctx, "Stale Purchase", fmt.Sprintf("%v has staled", r.GetRelease().InstanceId), false)
+		}
 	}
 
 	if len(missingCondition) > 0 {
