@@ -48,6 +48,10 @@ func (rc *testRc) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record
 	if rc.fail || rc.failAll {
 		return nil, fmt.Errorf("Built to fail")
 	}
+	if instanceID == 1233 {
+		return &pbrc.Record{Release: &pbgd.Release{Title: "Madeup"}, Metadata: &pbrc.ReleaseMetadata{DateAdded: 1234, Category: pbrc.ReleaseMetadata_PURCHASED}}, nil
+	}
+
 	if instanceID == 1234 {
 		return &pbrc.Record{Release: &pbgd.Release{Title: "Madeup"}, Metadata: &pbrc.ReleaseMetadata{DateAdded: 1234, Category: pbrc.ReleaseMetadata_LISTED_TO_SELL}}, nil
 	}
@@ -65,7 +69,7 @@ func (rc *testRc) getRecordsInFolder(ctx context.Context, folder int32) ([]int32
 	if rc.fail {
 		return []int32{}, fmt.Errorf("Built to fail")
 	}
-	return []int32{1234}, nil
+	return []int32{1234, 1233}, nil
 }
 
 func (rc *testRc) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
