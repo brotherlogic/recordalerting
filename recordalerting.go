@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"time"
 
 	"github.com/brotherlogic/goserver"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	pbgh "github.com/brotherlogic/githubcard/proto"
 	pbg "github.com/brotherlogic/goserver/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 	pbro "github.com/brotherlogic/recordsorganiser/proto"
@@ -120,35 +118,10 @@ func (gh *prodRC) getRecordsInFolder(ctx context.Context, folder int32) ([]int32
 	return recs.GetInstanceIds(), nil
 }
 
-type gh interface {
-	alert(ctx context.Context, r *pbrc.Record, text string) error
-}
-
-type prodGh struct {
-	dial func(server string) (*grpc.ClientConn, error)
-}
-
-func (gh *prodGh) alert(ctx context.Context, r *pbrc.Record, text string) error {
-	conn, err := gh.dial("githubcard")
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	client := pbgh.NewGithubClient(conn)
-	if r != nil {
-		_, err = client.AddIssue(ctx, &pbgh.Issue{Title: "Problematic Record", Body: fmt.Sprintf("%v - %v", text, r.GetRelease().Title), Service: "recordcollection"})
-	} else {
-		_, err = client.AddIssue(ctx, &pbgh.Issue{Title: "Problematic Record", Body: fmt.Sprintf("%v", text), Service: "recordcollection"})
-	}
-	return err
-}
-
 //Server main server type
 type Server struct {
 	*goserver.GoServer
 	rc             rc
-	gh             gh
 	ro             ro
 	invalidRecords int
 }
@@ -156,7 +129,6 @@ type Server struct {
 // Init builds the server
 func Init() *Server {
 	s := &Server{GoServer: &goserver.GoServer{}}
-	s.gh = &prodGh{s.DialMaster}
 	s.rc = &prodRC{s.DialMaster}
 	s.ro = &prodRO{s.DialMaster}
 	return s
@@ -199,14 +171,8 @@ func main() {
 	server := Init()
 	server.PrepServer()
 	server.Register = server
-	server.RegisterRepeatingTask(server.alertForMissingSaleID, "alert_for_missing_sale_id", time.Hour)
-	server.RegisterRepeatingTask(server.alertForPurgatory, "alert_for_purgatory", time.Hour)
-	server.RegisterRepeatingTask(server.alertForMisorderedMPI, "alert_for_misordered_mpi", time.Hour)
-	server.RegisterRepeatingTask(server.alertForOldListeningBoxRecord, "alert_for_old_listening_box_record", time.Hour)
-	server.RegisterRepeatingTask(server.alertForOldListeningPileRecord, "alert_for_old_listening_pile_record", time.Hour)
-	server.RegisterRepeatingTask(server.validateRecords, "validate_records", time.Minute*5)
 
-	err := server.RegisterServerV2("recordalerting", false, false)
+	err := server.RegisterServerV2("recordalerting", false, true)
 	if err != nil {
 		return
 	}
