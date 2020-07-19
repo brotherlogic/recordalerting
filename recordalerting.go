@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc"
 
 	pbg "github.com/brotherlogic/goserver/proto"
-	pbrc "github.com/brotherlogic/recordcollection/proto"
+	rcpb "github.com/brotherlogic/recordcollection/proto"
 	pbro "github.com/brotherlogic/recordsorganiser/proto"
 )
 
@@ -45,8 +45,8 @@ func (gh *prodRO) getLocation(ctx context.Context, name string) (*pbro.Location,
 }
 
 type rc interface {
-	getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error)
-	getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
+	getRecord(ctx context.Context, instanceID int32) (*rcpb.Record, error)
+	getLibraryRecords(ctx context.Context) ([]*rcpb.Record, error)
 	getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error)
 }
 
@@ -54,15 +54,15 @@ type prodRC struct {
 	dial func(server string) (*grpc.ClientConn, error)
 }
 
-func (gh *prodRC) getRecord(ctx context.Context, i int32) (*pbrc.Record, error) {
+func (gh *prodRC) getRecord(ctx context.Context, i int32) (*rcpb.Record, error) {
 	conn, err := gh.dial("recordcollection")
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Close()
 
-	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.GetRecord(ctx, &pbrc.GetRecordRequest{InstanceId: i})
+	client := rcpb.NewRecordCollectionServiceClient(conn)
+	recs, err := client.GetRecord(ctx, &rcpb.GetRecordRequest{InstanceId: i})
 
 	if err != nil {
 		return nil, err
@@ -71,10 +71,10 @@ func (gh *prodRC) getRecord(ctx context.Context, i int32) (*pbrc.Record, error) 
 	return recs.GetRecord(), nil
 }
 
-func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error) {
+func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*rcpb.Record, error) {
 	conn, err := gh.dial("recordsorganiser")
 	if err != nil {
-		return []*pbrc.Record{}, err
+		return []*rcpb.Record{}, err
 	}
 	defer conn.Close()
 
@@ -82,18 +82,18 @@ func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
 	resp, err := client.GetOrganisation(ctx, &pbro.GetOrganisationRequest{Locations: []*pbro.Location{&pbro.Location{Name: "Library Records"}}})
 
 	if err != nil {
-		return []*pbrc.Record{}, err
+		return []*rcpb.Record{}, err
 	}
 
 	if len(resp.GetLocations()) != 1 {
-		return []*pbrc.Record{}, fmt.Errorf("Too many locations returned: %v", len(resp.GetLocations()))
+		return []*rcpb.Record{}, fmt.Errorf("Too many locations returned: %v", len(resp.GetLocations()))
 	}
 
-	recs := make([]*pbrc.Record, 0)
+	recs := make([]*rcpb.Record, 0)
 	for _, loc := range resp.GetLocations()[0].GetReleasesLocation() {
 		rec, err := gh.getRecord(ctx, loc.GetInstanceId())
 		if err != nil {
-			return []*pbrc.Record{}, err
+			return []*rcpb.Record{}, err
 		}
 		recs = append(recs, rec)
 	}
@@ -108,8 +108,8 @@ func (gh *prodRC) getRecordsInFolder(ctx context.Context, folder int32) ([]int32
 	}
 	defer conn.Close()
 
-	client := pbrc.NewRecordCollectionServiceClient(conn)
-	recs, err := client.QueryRecords(ctx, &pbrc.QueryRecordsRequest{Query: &pbrc.QueryRecordsRequest_FolderId{folder}})
+	client := rcpb.NewRecordCollectionServiceClient(conn)
+	recs, err := client.QueryRecords(ctx, &rcpb.QueryRecordsRequest{Query: &rcpb.QueryRecordsRequest_FolderId{folder}})
 
 	if err != nil {
 		return []int32{}, err
@@ -137,6 +137,7 @@ func Init() *Server {
 // DoRegister does RPC registration
 func (s *Server) DoRegister(server *grpc.Server) {
 	// Do nothing
+	rcpb.RegisterClientUpdateServiceServer(server, s)
 }
 
 // ReportHealth alerts if we're not healthy
