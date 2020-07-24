@@ -20,11 +20,11 @@ type ro interface {
 }
 
 type prodRO struct {
-	dial func(server string) (*grpc.ClientConn, error)
+	dial func(ctx context.Context, server string) (*grpc.ClientConn, error)
 }
 
 func (gh *prodRO) getLocation(ctx context.Context, name string) (*pbro.Location, error) {
-	conn, err := gh.dial("recordsorganiser")
+	conn, err := gh.dial(ctx, "recordsorganiser")
 	if err != nil {
 		return &pbro.Location{}, err
 	}
@@ -51,11 +51,11 @@ type rc interface {
 }
 
 type prodRC struct {
-	dial func(server string) (*grpc.ClientConn, error)
+	dial func(ctx context.Context, server string) (*grpc.ClientConn, error)
 }
 
 func (gh *prodRC) getRecord(ctx context.Context, i int32) (*rcpb.Record, error) {
-	conn, err := gh.dial("recordcollection")
+	conn, err := gh.dial(ctx, "recordcollection")
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (gh *prodRC) getRecord(ctx context.Context, i int32) (*rcpb.Record, error) 
 }
 
 func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*rcpb.Record, error) {
-	conn, err := gh.dial("recordsorganiser")
+	conn, err := gh.dial(ctx, "recordsorganiser")
 	if err != nil {
 		return []*rcpb.Record{}, err
 	}
@@ -102,7 +102,7 @@ func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*rcpb.Record, error)
 }
 
 func (gh *prodRC) getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error) {
-	conn, err := gh.dial("recordcollection")
+	conn, err := gh.dial(ctx, "recordcollection")
 	if err != nil {
 		return []int32{}, err
 	}
@@ -129,8 +129,8 @@ type Server struct {
 // Init builds the server
 func Init() *Server {
 	s := &Server{GoServer: &goserver.GoServer{}}
-	s.rc = &prodRC{s.DialMaster}
-	s.ro = &prodRO{s.DialMaster}
+	s.rc = &prodRC{s.FDialServer}
+	s.ro = &prodRO{s.FDialServer}
 	return s
 }
 
