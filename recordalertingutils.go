@@ -44,7 +44,7 @@ func (s *Server) alertForMissingSaleID(r *pbrc.Record) {
 }
 
 func (s *Server) alertForPurgatory(r *pbrc.Record) {
-	if !r.GetMetadata().GetDirty() {
+	if !r.GetMetadata().GetDirty() && r.GetRelease().GetFolderId() == 1362206 {
 		s.RaiseIssue(fmt.Sprintf("%v is a problematic record - purg", r.GetRelease().GetInstanceId()), fmt.Sprintf("[%v]. %v is in Purgatory!", r.GetRelease().GetId(), r.GetRelease().GetTitle()))
 	}
 }
