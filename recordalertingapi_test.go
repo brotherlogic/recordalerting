@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"testing"
 
 	"golang.org/x/net/context"
 
 	pbgd "github.com/brotherlogic/godiscogs"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
+	rcpb "github.com/brotherlogic/recordcollection/proto"
 	pbro "github.com/brotherlogic/recordsorganiser/proto"
 )
 
@@ -115,4 +117,24 @@ func (rc *testRc) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
 		&pbrc.Record{Release: &pbgd.Release{Title: "Sports Et Action"}},
 	}, nil
 
+}
+
+func TestUpdateRun(t *testing.T) {
+	s := InitTest()
+
+	_, err := s.ClientUpdate(context.Background(), &rcpb.ClientUpdateRequest{InstanceId: 1234})
+
+	if err != nil {
+		t.Errorf("Update failed: %v", err)
+	}
+}
+
+func TestUpdateRunBadRecordPull(t *testing.T) {
+	s := InitTest()
+
+	_, err := s.ClientUpdate(context.Background(), &rcpb.ClientUpdateRequest{})
+
+	if err == nil {
+		t.Errorf("Update failed: %v", err)
+	}
 }
