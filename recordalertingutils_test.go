@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 
+	pbgd "github.com/brotherlogic/godiscogs"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 )
 
@@ -21,7 +22,7 @@ func TestPurgatory(t *testing.T) {
 	s.SkipIssue = true
 	s.rc = &testRc{}
 
-	s.alertForPurgatory(&pbrc.Record{})
+	s.alertForPurgatory(&pbrc.Record{Release: &pbgd.Release{FolderId: 1362206}})
 
 }
 
