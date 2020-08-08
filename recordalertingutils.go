@@ -53,13 +53,13 @@ func (s *Server) alertForPurgatory(r *pbrc.Record) {
 }
 
 func (s *Server) alertForOldListeningBoxRecord(rec *pbrc.Record) {
-	if time.Now().Sub(time.Unix(rec.GetMetadata().GetDateAdded(), 0)) > time.Hour*24*30*4 {
+	if time.Now().Sub(time.Unix(rec.GetMetadata().GetDateAdded(), 0)) > time.Hour*24*30*4 && rec.GetRelease().GetFolderId() == 673768 {
 		s.RaiseIssue(fmt.Sprintf("%v old listening box", rec.GetRelease().GetInstanceId()), fmt.Sprintf("Record %v [%v] has been in the listening box for %v", rec.GetRelease().GetTitle(), rec.GetRelease().GetInstanceId(), time.Now().Sub(time.Unix(rec.GetMetadata().GetDateAdded(), 0))))
 	}
 }
 
 func (s *Server) alertForOldListeningPileRecord(rec *pbrc.Record) {
-	if time.Now().Sub(time.Unix(rec.GetMetadata().GetLastMoveTime(), 0)) > time.Hour*24*30 {
+	if time.Now().Sub(time.Unix(rec.GetMetadata().GetLastMoveTime(), 0)) > time.Hour*24*30 && rec.GetRelease().GetFolderId() == 812802 {
 		s.RaiseIssue(fmt.Sprintf("%v old listening pile", rec.GetRelease().GetInstanceId()), fmt.Sprintf("Record %v has been in the listening pile for %v", rec.GetRelease().GetTitle(), time.Now().Sub(time.Unix(rec.GetMetadata().GetLastMoveTime(), 0))))
 	}
 }
