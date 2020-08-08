@@ -23,7 +23,9 @@ func (s *Server) validateRecord(r *pbrc.Record) {
 		s.invalidRecords++
 	}
 
-	if (len(r.GetRelease().GetRecordCondition()) == 0 || len(r.GetRelease().GetSleeveCondition()) == 0) && r.GetMetadata().GetGoalFolder() != 1782105 {
+	if (len(r.GetRelease().GetRecordCondition()) == 0 || len(r.GetRelease().GetSleeveCondition()) == 0) &&
+		r.GetMetadata().GetGoalFolder() != 1782105 &&
+		r.GetMetadata().GetGoalFolder() != 1433217 {
 		s.RaiseIssue(fmt.Sprintf("%v Missing Condition", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v is missing conditions. Fix it here https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
 	}
 
