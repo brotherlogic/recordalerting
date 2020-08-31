@@ -53,29 +53,6 @@ func TestOldListeningBox(t *testing.T) {
 
 }
 
-func TestOldListeningPile(t *testing.T) {
-	s := InitTest()
-
-	s.alertForOldListeningPileRecord(&pbrc.Record{})
-
-}
-
-func TestOldListeningPileFailRO(t *testing.T) {
-	s := InitTest()
-	s.ro = &testRo{fail: true}
-
-	s.alertForOldListeningPileRecord(&pbrc.Record{})
-
-}
-
-func TestOldListeningPileFailRC(t *testing.T) {
-	s := InitTest()
-	s.rc = &testRc{fail: true}
-
-	s.alertForOldListeningPileRecord(&pbrc.Record{})
-
-}
-
 func TestInvalid(t *testing.T) {
 	s := InitTest()
 	s.validateRecord(&pbrc.Record{})
