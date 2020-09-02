@@ -11,7 +11,6 @@ func (s *Server) assessRecord(r *pbrc.Record) error {
 	s.validateRecord(r)
 	s.alertForMissingSaleID(r)
 	s.alertForPurgatory(r)
-	s.alertForOldListeningBoxRecord(r)
 
 	return nil
 }
@@ -48,11 +47,5 @@ func (s *Server) alertForMissingSaleID(r *pbrc.Record) {
 func (s *Server) alertForPurgatory(r *pbrc.Record) {
 	if !r.GetMetadata().GetDirty() && r.GetRelease().GetFolderId() == 1362206 {
 		s.RaiseIssue(fmt.Sprintf("%v is a problematic record - purg", r.GetRelease().GetInstanceId()), fmt.Sprintf("[%v]. %v is in Purgatory!", r.GetRelease().GetId(), r.GetRelease().GetTitle()))
-	}
-}
-
-func (s *Server) alertForOldListeningBoxRecord(rec *pbrc.Record) {
-	if time.Now().Sub(time.Unix(rec.GetMetadata().GetDateAdded(), 0)) > time.Hour*24*30*4 && rec.GetRelease().GetFolderId() == 673768 {
-		s.RaiseIssue(fmt.Sprintf("%v old listening box", rec.GetRelease().GetInstanceId()), fmt.Sprintf("Record %v [%v] has been in the listening box for %v", rec.GetRelease().GetTitle(), rec.GetRelease().GetInstanceId(), time.Now().Sub(time.Unix(rec.GetMetadata().GetDateAdded(), 0))))
 	}
 }

@@ -46,13 +46,6 @@ func InitTest() *Server {
 	return s
 }
 
-func TestOldListeningBox(t *testing.T) {
-	s := InitTest()
-
-	s.alertForOldListeningBoxRecord(&pbrc.Record{})
-
-}
-
 func TestInvalid(t *testing.T) {
 	s := InitTest()
 	s.validateRecord(&pbrc.Record{})
