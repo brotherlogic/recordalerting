@@ -25,7 +25,9 @@ func (s *Server) validateRecord(r *pbrc.Record) {
 		r.GetMetadata().GetGoalFolder() != 1782105 &&
 		r.GetMetadata().GetGoalFolder() != 1433217 &&
 		r.GetMetadata().GetGoalFolder() != 268147 {
-		s.RaiseIssue(fmt.Sprintf("%v Missing Condition", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v is missing conditions. Fix it here https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
+		if r.GetRelease().GetFolderId() == 812802 {
+			s.RaiseIssue(fmt.Sprintf("%v Missing Condition", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v is missing conditions. Fix it here https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
+		}
 	}
 
 	if r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_PURCHASED && time.Now().Sub(time.Unix(r.GetMetadata().GetLastUpdateTime(), 0)) > time.Hour*24 {
