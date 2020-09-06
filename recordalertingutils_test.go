@@ -52,3 +52,10 @@ func TestInvalid(t *testing.T) {
 	s.validateRecord(&pbrc.Record{Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_PURCHASED}})
 	s.assessRecord(&pbrc.Record{})
 }
+
+func TestInvalidListeningPile(t *testing.T) {
+	s := InitTest()
+	s.validateRecord(&pbrc.Record{})
+	s.validateRecord(&pbrc.Record{Release: &pbgd.Release{FolderId: 812802}, Metadata: &pbrc.ReleaseMetadata{}})
+	s.assessRecord(&pbrc.Record{})
+}
