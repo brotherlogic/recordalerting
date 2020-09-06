@@ -30,6 +30,10 @@ func (s *Server) validateRecord(r *pbrc.Record) {
 		}
 	}
 
+	if r.GetRelease().GetFolderId() == 812802 && r.GetMetadata().GetSpineWidth() == 0 {
+		s.RaiseIssue(fmt.Sprintf("%v Missing Width", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v is missing the width: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetTitle(), r.GetRelease().GetId()))
+	}
+
 	if r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_PURCHASED && time.Now().Sub(time.Unix(r.GetMetadata().GetLastUpdateTime(), 0)) > time.Hour*24 {
 		s.RaiseIssue(fmt.Sprintf("%v Stale Purchase", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v has staled", r.GetRelease().GetInstanceId()))
 	}
