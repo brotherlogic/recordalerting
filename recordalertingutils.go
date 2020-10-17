@@ -31,7 +31,8 @@ func (s *Server) validateRecord(r *pbrc.Record) {
 	}
 
 	if r.GetRelease().GetFolderId() == 812802 && r.GetMetadata().GetRecordWidth() == 0 &&
-		(r.GetMetadata().GetGoalFolder() != 1782105) {
+		(r.GetMetadata().GetGoalFolder() != 1782105 &&
+			r.GetMetadata().GetGoalFolder() != 2274270) {
 		s.RaiseIssue(fmt.Sprintf("%v Missing Width", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v is missing the width: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetTitle(), r.GetRelease().GetId()))
 	}
 
