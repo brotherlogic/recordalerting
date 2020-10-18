@@ -124,6 +124,7 @@ type Server struct {
 	rc             rc
 	ro             ro
 	invalidRecords int
+	alertCount     int
 }
 
 // Init builds the server
