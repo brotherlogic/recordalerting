@@ -30,6 +30,7 @@ func (s *Server) validateRecord(r *pbrc.Record) {
 	if (len(r.GetRelease().GetRecordCondition()) == 0 || len(r.GetRelease().GetSleeveCondition()) == 0) &&
 		r.GetMetadata().GetGoalFolder() != 1782105 &&
 		r.GetMetadata().GetGoalFolder() != 1433217 &&
+		r.GetMetadata().GetGoalFolder() != 2274270 &&
 		r.GetMetadata().GetGoalFolder() != 268147 {
 		if r.GetRelease().GetFolderId() == 812802 {
 			s.alertCount++
