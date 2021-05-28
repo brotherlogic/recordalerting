@@ -38,6 +38,10 @@ func (s *Server) validateRecord(r *pbrc.Record) {
 		}
 	}
 
+	if r.GetMetadata().GetGoalFolder() == 1613206 && r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_SOLD_ARCHIVE {
+		s.RaiseIssue(fmt.Sprintf("%v is marked as sold, but is not SOLD_ARCHIVE", r.GetRelease().GetInstanceId()), fmt.Sprintf("It's %v ->  https://www.discogs.com/madeup/release/%v", r.GetMetadata().GetCategory(), r.GetRelease().GetId()))
+	}
+
 	if r.GetRelease().GetFolderId() == 812802 && r.GetMetadata().GetRecordWidth() == 0 &&
 		(r.GetMetadata().GetGoalFolder() != 1782105 &&
 			r.GetMetadata().GetGoalFolder() != 2274270) {
