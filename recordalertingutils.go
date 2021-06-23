@@ -42,13 +42,6 @@ func (s *Server) validateRecord(r *pbrc.Record) {
 		s.RaiseIssue(fmt.Sprintf("%v is marked as sold, but is not SOLD_ARCHIVE", r.GetRelease().GetInstanceId()), fmt.Sprintf("It's %v ->  https://www.discogs.com/madeup/release/%v", r.GetMetadata().GetCategory(), r.GetRelease().GetId()))
 	}
 
-	if r.GetRelease().GetFolderId() == 812802 && r.GetMetadata().GetRecordWidth() == 0 &&
-		(r.GetMetadata().GetGoalFolder() != 1782105 &&
-			r.GetMetadata().GetGoalFolder() != 2274270) {
-		s.alertCount++
-		s.RaiseIssue(fmt.Sprintf("%v Missing Width", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v is missing the width: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetTitle(), r.GetRelease().GetId()))
-	}
-
 	if r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_PURCHASED && time.Now().Sub(time.Unix(r.GetMetadata().GetLastUpdateTime(), 0)) > time.Hour*24 {
 		s.alertCount++
 		s.RaiseIssue(fmt.Sprintf("%v Stale Purchase", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v has staled", r.GetRelease().GetInstanceId()))
