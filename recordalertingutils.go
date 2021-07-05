@@ -8,6 +8,11 @@ import (
 )
 
 func (s *Server) assessRecord(r *pbrc.Record) error {
+	// We don't alert on boxed records
+	if r.GetMetadata().GetBoxState() == pbrc.ReleaseMetadata_IN_THE_BOX {
+		return nil
+	}
+
 	s.validateRecord(r)
 	s.alertForMissingSaleID(r)
 	s.alertForPurgatory(r)
@@ -24,7 +29,7 @@ func (s *Server) validateRecord(r *pbrc.Record) {
 
 	if r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_STAGED_TO_SELL && r.GetRelease().GetRating() == 4 {
 		s.alertCount++
-		s.RaiseIssue(fmt.Sprintf("%v Needs Attention", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v is stuck staged to sell", r.GetRelease().GetTitle()))
+		s.RaiseIssue(fmt.Sprintf("%v Needs your Attention", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v is stuck staged to sell", r.GetRelease().GetTitle()))
 	}
 
 	if (len(r.GetRelease().GetRecordCondition()) == 0 || len(r.GetRelease().GetSleeveCondition()) == 0) &&
