@@ -9,7 +9,7 @@ import (
 
 func (s *Server) assessRecord(r *pbrc.Record) error {
 	// We don't alert on boxed records
-	if r.GetMetadata().GetBoxState() == pbrc.ReleaseMetadata_IN_THE_BOX {
+	if r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_OUT_OF_BOX && r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_BOX_UNKNOWN {
 		return nil
 	}
 
