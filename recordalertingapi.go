@@ -1,7 +1,9 @@
 package main
 
-import "golang.org/x/net/context"
-import rcpb "github.com/brotherlogic/recordcollection/proto"
+import (
+	rcpb "github.com/brotherlogic/recordcollection/proto"
+	"golang.org/x/net/context"
+)
 
 //ClientUpdate process new record
 func (s *Server) ClientUpdate(ctx context.Context, req *rcpb.ClientUpdateRequest) (*rcpb.ClientUpdateResponse, error) {
@@ -10,5 +12,5 @@ func (s *Server) ClientUpdate(ctx context.Context, req *rcpb.ClientUpdateRequest
 		return nil, err
 	}
 
-	return &rcpb.ClientUpdateResponse{}, s.assessRecord(r)
+	return &rcpb.ClientUpdateResponse{}, s.assessRecord(ctx, r)
 }

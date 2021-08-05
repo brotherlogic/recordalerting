@@ -5,9 +5,12 @@ import (
 	"time"
 
 	pbrc "github.com/brotherlogic/recordcollection/proto"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-func (s *Server) assessRecord(r *pbrc.Record) error {
+func (s *Server) assessRecord(ctx context.Context, r *pbrc.Record) error {
 	// We don't alert on boxed records
 	if r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_OUT_OF_BOX && r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_BOX_UNKNOWN {
 		return nil
@@ -16,6 +19,42 @@ func (s *Server) assessRecord(r *pbrc.Record) error {
 	s.validateRecord(r)
 	s.alertForMissingSaleID(r)
 	s.alertForPurgatory(r)
+
+	if r.GetMetadata().GetMoveFolder() == 812802 {
+		fail := false
+		var cleanFail error
+		if r.GetMetadata().GetRecordWidth() == 0 {
+			fail = true
+			s.RaiseIssue(fmt.Sprintf("%v needs width", r.GetRelease().GetTitle()), fmt.Sprintf("This one: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetId()))
+		}
+
+		if r.GetRelease().GetRecordCondition() == "" {
+			fail = true
+			s.RaiseIssue(fmt.Sprintf("%v needs condition", r.GetRelease().GetTitle()), fmt.Sprintf("This one: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetId()))
+		}
+
+		if r.GetMetadata().GetWeightInGrams() == 0 {
+			fail = true
+			s.RaiseIssue(fmt.Sprintf("%v needs weight", r.GetRelease().GetTitle()), fmt.Sprintf("This one: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetId()))
+		}
+
+		if r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_UNKNOWN {
+			fail = true
+			s.RaiseIssue(fmt.Sprintf("%v needs a filed state", r.GetRelease().GetTitle()), fmt.Sprintf("This one: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetId()))
+		}
+
+		if time.Since(time.Unix(r.GetMetadata().GetLastCleanDate(), 0)) > time.Hour*24*365*3 {
+			cleanFail = s.rc.clean(ctx, r.GetRelease().GetInstanceId())
+		}
+
+		if fail {
+			return status.Errorf(codes.FailedPrecondition, "Record fails validation - please fix")
+		}
+
+		if cleanFail != nil {
+			return cleanFail
+		}
+	}
 
 	return nil
 }
