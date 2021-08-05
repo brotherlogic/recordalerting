@@ -6,7 +6,7 @@ require (
 	github.com/brotherlogic/discovery v0.0.0-20210626180714-1ae56396f4e1 // indirect
 	github.com/brotherlogic/gobuildslave v0.0.0-20210626211527-ff107a8a9b1d // indirect
 	github.com/brotherlogic/godiscogs v0.0.0-20210527024337-f82403e3d903
-	github.com/brotherlogic/goserver v0.0.0-20210804183456-bad9dc5d026a
+	github.com/brotherlogic/goserver v0.0.0-20210805130102-24f4ac0bb699
 	github.com/brotherlogic/recordcollection v0.0.0-20210804183554-43804f310007
 	github.com/brotherlogic/recordsorganiser v0.0.0-20210706222422-7d8c036fc939
 	github.com/golang/protobuf v1.5.2
