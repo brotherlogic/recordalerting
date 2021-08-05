@@ -28,8 +28,8 @@ func (s *Server) assessRecord(ctx context.Context, r *pbrc.Record) error {
 			s.RaiseIssue(fmt.Sprintf("%v needs width", r.GetRelease().GetTitle()), fmt.Sprintf("This one: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetId()))
 		}
 
+		// Note that condition is read on commit, so we can't fail this here
 		if r.GetRelease().GetRecordCondition() == "" {
-			fail = true
 			s.RaiseIssue(fmt.Sprintf("%v needs condition", r.GetRelease().GetTitle()), fmt.Sprintf("This one: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetId()))
 		}
 
