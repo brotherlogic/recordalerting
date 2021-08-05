@@ -83,7 +83,7 @@ func (gh *prodRC) clean(ctx context.Context, i int32) error {
 	client := rcpb.NewRecordCollectionServiceClient(conn)
 	_, err = client.UpdateRecord(ctx, &rcpb.UpdateRecordRequest{Reason: "alert-clean", Update: &rcpb.Record{
 		Release:  &gdpb.Release{InstanceId: i},
-		Metadata: &rcpb.ReleaseMetadata{GoalFolder: 3386035},
+		Metadata: &rcpb.ReleaseMetadata{MoveFolder: 3386035},
 	}})
 
 	if err != nil {
