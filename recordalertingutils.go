@@ -25,22 +25,22 @@ func (s *Server) assessRecord(ctx context.Context, r *pbrc.Record) error {
 		var cleanFail error
 		if r.GetMetadata().GetRecordWidth() == 0 {
 			fail = true
-			s.RaiseIssue(fmt.Sprintf("%v needs width", r.GetRelease().GetTitle()), fmt.Sprintf("This one: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetId()))
+			s.RaiseIssue(fmt.Sprintf("%v needs width", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
 		}
 
 		// Note that condition is read on commit, so we can't fail this here
 		if r.GetRelease().GetRecordCondition() == "" {
-			s.RaiseIssue(fmt.Sprintf("%v needs condition", r.GetRelease().GetTitle()), fmt.Sprintf("This one: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetId()))
+			s.RaiseIssue(fmt.Sprintf("%v needs condition", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
 		}
 
 		if r.GetMetadata().GetWeightInGrams() == 0 {
 			fail = true
-			s.RaiseIssue(fmt.Sprintf("%v needs weight", r.GetRelease().GetTitle()), fmt.Sprintf("This one: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetId()))
+			s.RaiseIssue(fmt.Sprintf("%v needs weight", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
 		}
 
 		if r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_UNKNOWN {
 			fail = true
-			s.RaiseIssue(fmt.Sprintf("%v needs a filed state", r.GetRelease().GetTitle()), fmt.Sprintf("This one: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetId()))
+			s.RaiseIssue(fmt.Sprintf("%v needs a filed state", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
 		}
 
 		if time.Since(time.Unix(r.GetMetadata().GetLastCleanDate(), 0)) > time.Hour*24*365*3 {
