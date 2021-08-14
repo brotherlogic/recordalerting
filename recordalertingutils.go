@@ -43,16 +43,19 @@ func (s *Server) assessRecord(ctx context.Context, r *pbrc.Record) error {
 			s.RaiseIssue(fmt.Sprintf("%v needs a filed state", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
 		}
 
-		if time.Since(time.Unix(r.GetMetadata().GetLastCleanDate(), 0)) > time.Hour*24*365*3 {
-			cleanFail = s.rc.clean(ctx, r.GetRelease().GetInstanceId())
-		}
+		// Only fail
+		if r.GetMetadata().GetMoveFolder() == 812802 {
+			if time.Since(time.Unix(r.GetMetadata().GetLastCleanDate(), 0)) > time.Hour*24*365*3 {
+				cleanFail = s.rc.clean(ctx, r.GetRelease().GetInstanceId())
+			}
 
-		if fail {
-			return status.Errorf(codes.FailedPrecondition, "Record fails validation - please fix")
-		}
+			if fail {
+				return status.Errorf(codes.FailedPrecondition, "Record fails validation - please fix")
+			}
 
-		if cleanFail != nil {
-			return cleanFail
+			if cleanFail != nil {
+				return cleanFail
+			}
 		}
 	}
 
