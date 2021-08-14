@@ -20,7 +20,7 @@ func (s *Server) assessRecord(ctx context.Context, r *pbrc.Record) error {
 	s.alertForMissingSaleID(r)
 	s.alertForPurgatory(r)
 
-	if r.GetMetadata().GetMoveFolder() == 812802 {
+	if r.GetMetadata().GetMoveFolder() == 812802 || r.GetRelease().GetFolderId() == 3380098 {
 		fail := false
 		var cleanFail error
 		if r.GetMetadata().GetRecordWidth() == 0 {
