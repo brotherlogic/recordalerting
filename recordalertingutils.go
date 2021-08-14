@@ -44,11 +44,11 @@ func (s *Server) assessRecord(ctx context.Context, r *pbrc.Record) error {
 		}
 
 		// Only fail
-		if r.GetMetadata().GetMoveFolder() == 812802 {
-			if time.Since(time.Unix(r.GetMetadata().GetLastCleanDate(), 0)) > time.Hour*24*365*3 {
-				cleanFail = s.rc.clean(ctx, r.GetRelease().GetInstanceId())
-			}
+		if time.Since(time.Unix(r.GetMetadata().GetLastCleanDate(), 0)) > time.Hour*24*365*3 {
+			cleanFail = s.rc.clean(ctx, r.GetRelease().GetInstanceId())
+		}
 
+		if r.GetMetadata().GetMoveFolder() == 812802 {
 			if fail {
 				return status.Errorf(codes.FailedPrecondition, "Record fails validation - please fix")
 			}
