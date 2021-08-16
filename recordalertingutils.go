@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	gd "github.com/brotherlogic/godiscogs"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
@@ -44,7 +45,7 @@ func (s *Server) assessRecord(ctx context.Context, r *pbrc.Record) error {
 		}
 
 		// Only fail
-		if r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_12_INCH || r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_7_INCH {
+		if r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_12_INCH || r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_7_INCH || r.GetMetadata().GetSaleState() == gd.SaleState_SOLD {
 			if time.Since(time.Unix(r.GetMetadata().GetLastCleanDate(), 0)) > time.Hour*24*365*3 {
 				cleanFail = s.rc.clean(ctx, r.GetRelease().GetInstanceId())
 			}
