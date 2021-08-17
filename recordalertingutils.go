@@ -24,19 +24,23 @@ func (s *Server) assessRecord(ctx context.Context, r *pbrc.Record) error {
 	if r.GetMetadata().GetMoveFolder() == 812802 {
 		fail := false
 		var cleanFail error
-		if r.GetMetadata().GetRecordWidth() == 0 {
-			fail = true
-			s.RaiseIssue(fmt.Sprintf("%v needs width", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
-		}
 
-		// Note that condition is read on commit, so we can't fail this here
-		if r.GetRelease().GetRecordCondition() == "" {
-			s.RaiseIssue(fmt.Sprintf("%v needs condition", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
-		}
+		//Physical properties don't apply to digital
+		if r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL {
+			if r.GetMetadata().GetRecordWidth() == 0 {
+				fail = true
+				s.RaiseIssue(fmt.Sprintf("%v needs width", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
+			}
 
-		if r.GetMetadata().GetWeightInGrams() == 0 {
-			fail = true
-			s.RaiseIssue(fmt.Sprintf("%v needs weight", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
+			// Note that condition is read on commit, so we can't fail this here
+			if r.GetRelease().GetRecordCondition() == "" {
+				s.RaiseIssue(fmt.Sprintf("%v needs condition", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
+			}
+
+			if r.GetMetadata().GetWeightInGrams() == 0 {
+				fail = true
+				s.RaiseIssue(fmt.Sprintf("%v needs weight", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
+			}
 		}
 
 		if r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_UNKNOWN {
