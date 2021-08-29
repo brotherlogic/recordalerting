@@ -71,7 +71,7 @@ func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Reco
 func (s *Server) needsFiled(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
 		r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_UNKNOWN,
-		pb.Problem_MISSING_FILED, "needs weight")
+		pb.Problem_MISSING_FILED, "needs filling")
 }
 
 func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
