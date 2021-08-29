@@ -13,33 +13,27 @@ import (
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 )
 
-func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
-	// We don't alert on boxed records
-	if r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_OUT_OF_BOX && r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_BOX_UNKNOWN {
-		return nil
-	}
-
+func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Record, needs bool, class pb.Problem_ProblemType, errorMessage string) error {
 	// Does this record need a weight
-	needsWeight := r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetWeightInGrams() == 0
 	alreadySeen := false
 	var number int32
 	for _, problem := range config.GetProblems() {
-		if problem.GetType() == pb.Problem_MISSING_WEIGHT && problem.GetInstanceId() == r.GetRelease().GetInstanceId() {
+		if problem.GetType() == class && problem.GetInstanceId() == r.GetRelease().GetInstanceId() {
 			alreadySeen = true
 			number = problem.GetIssueNumber()
 		}
 	}
-	if needsWeight && !alreadySeen {
-		issue, err := s.ImmediateIssue(ctx, fmt.Sprintf("%v needs weight", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
+	if needs && !alreadySeen {
+		issue, err := s.ImmediateIssue(ctx, fmt.Sprintf("%v %v", r.GetRelease().GetTitle(), errorMessage), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
 		if err != nil {
 			return err
 		}
 
 		config.Problems = append(config.Problems, &pb.Problem{
-			Type:        pb.Problem_MISSING_WEIGHT,
+			Type:        class,
 			IssueNumber: issue.GetNumber(),
 			InstanceId:  r.GetRelease().GetInstanceId()})
-	} else if !needsWeight && alreadySeen {
+	} else if !needs && alreadySeen {
 		err := s.DeleteIssue(ctx, number)
 		if err != nil {
 			return err
@@ -47,7 +41,7 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 
 		var problems []*pb.Problem
 		for _, p := range config.GetProblems() {
-			if p.GetInstanceId() != r.GetRelease().GetInstanceId() || p.GetType() != pb.Problem_MISSING_WEIGHT {
+			if p.GetInstanceId() != r.GetRelease().GetInstanceId() || p.GetType() != class {
 				problems = append(problems, p)
 			}
 		}
@@ -56,6 +50,47 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 		if err != nil {
 			return err
 		}
+	}
+
+	if needs && (class == pb.Problem_MISSING_WEIGHT || class == pb.Problem_MISSING_WIDTH || class == pb.Problem_MISSING_FILED) {
+		return status.Errorf(codes.FailedPrecondition, "Record %v fails validation - please fix", r.GetRelease().GetInstanceId())
+	}
+	return nil
+}
+
+func (s *Server) needsWeight(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	return s.adjustState(ctx, config, r,
+		r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetWeightInGrams() == 0,
+		pb.Problem_MISSING_WEIGHT, "needs weight")
+}
+func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	return s.adjustState(ctx, config, r,
+		r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetRecordWidth() == 0,
+		pb.Problem_MISSING_WIDTH, "needs width")
+}
+func (s *Server) needsFiled(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	return s.adjustState(ctx, config, r,
+		r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_UNKNOWN,
+		pb.Problem_MISSING_FILED, "needs weight")
+}
+
+func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	// We don't alert on boxed records
+	if r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_OUT_OF_BOX && r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_BOX_UNKNOWN {
+		return nil
+	}
+
+	err := s.needsWeight(ctx, config, r)
+	if err != nil {
+		return err
+	}
+	err = s.needsWidth(ctx, config, r)
+	if err != nil {
+		return err
+	}
+	err = s.needsFiled(ctx, config, r)
+	if err != nil {
+		return err
 	}
 
 	s.validateRecord(r)
@@ -68,25 +103,12 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 
 		//Physical properties don't apply to digital
 		if r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL {
-			if r.GetMetadata().GetRecordWidth() == 0 {
-				fail = true
-				s.RaiseIssue(fmt.Sprintf("%v needs width", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
-			}
 
 			// Note that condition is read on commit, so we can't fail this here
 			if r.GetRelease().GetRecordCondition() == "" {
 				s.RaiseIssue(fmt.Sprintf("%v needs condition", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
 			}
 
-			if r.GetMetadata().GetWeightInGrams() == 0 {
-				fail = true
-				s.RaiseIssue(fmt.Sprintf("%v needs weight", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
-			}
-		}
-
-		if r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_UNKNOWN {
-			fail = true
-			s.RaiseIssue(fmt.Sprintf("%v needs a filed state", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
 		}
 
 		// Only fail
