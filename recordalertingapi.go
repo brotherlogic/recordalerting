@@ -12,5 +12,17 @@ func (s *Server) ClientUpdate(ctx context.Context, req *rcpb.ClientUpdateRequest
 		return nil, err
 	}
 
-	return &rcpb.ClientUpdateResponse{}, s.assessRecord(ctx, r)
+	config, err := s.loadConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.assessRecord(ctx, config, r)
+
+	errt := s.saveConfig(ctx, config)
+	if errt != nil {
+		return nil, errt
+	}
+
+	return &rcpb.ClientUpdateResponse{}, err
 }

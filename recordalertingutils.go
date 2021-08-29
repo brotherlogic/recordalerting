@@ -4,17 +4,39 @@ import (
 	"fmt"
 	"time"
 
-	gd "github.com/brotherlogic/godiscogs"
-	pbrc "github.com/brotherlogic/recordcollection/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	gd "github.com/brotherlogic/godiscogs"
+	pb "github.com/brotherlogic/recordalerting/proto"
+	pbrc "github.com/brotherlogic/recordcollection/proto"
 )
 
-func (s *Server) assessRecord(ctx context.Context, r *pbrc.Record) error {
+func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	// We don't alert on boxed records
 	if r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_OUT_OF_BOX && r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_BOX_UNKNOWN {
 		return nil
+	}
+
+	// Does this record need a weight
+	needsWeight := r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetWeightInGrams() == 0
+	alreadySeen := false
+	for _, problem := range config.GetProblems() {
+		if problem.GetType() == pb.Problem_MISSING_WEIGHT && problem.GetInstanceId() == r.GetRelease().GetInstanceId() {
+			alreadySeen = true
+		}
+	}
+	if needsWeight && !alreadySeen {
+		issue, err := s.ImmediateIssue(ctx, fmt.Sprintf("%v needs weight", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
+		if err != nil {
+			return err
+		}
+
+		config.Problems = append(config.Problems, &pb.Problem{
+			Type:        pb.Problem_MISSING_WEIGHT,
+			IssueNumber: issue.GetNumber(),
+			InstanceId:  r.GetRelease().GetInstanceId()})
 	}
 
 	s.validateRecord(r)

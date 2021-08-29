@@ -3,17 +3,17 @@ module github.com/brotherlogic/recordalerting
 go 1.16
 
 require (
-	github.com/brotherlogic/discovery v0.0.0-20210626180714-1ae56396f4e1 // indirect
-	github.com/brotherlogic/gobuildslave v0.0.0-20210626211527-ff107a8a9b1d // indirect
+	github.com/brotherlogic/dstore v0.0.0-20210728181450-e87a34c62535
+	github.com/brotherlogic/githubcard v0.0.0-20210829170051-b3b1b718d705 // indirect
 	github.com/brotherlogic/godiscogs v0.0.0-20210527024337-f82403e3d903
-	github.com/brotherlogic/goserver v0.0.0-20210805130102-24f4ac0bb699
-	github.com/brotherlogic/recordcollection v0.0.0-20210817133257-de55722935ae
-	github.com/brotherlogic/recordsorganiser v0.0.0-20210706222422-7d8c036fc939
+	github.com/brotherlogic/goserver v0.0.0-20210829172440-bbbc3d2326c0
+	github.com/brotherlogic/recordcollection v0.0.0-20210827234952-fddca4c52fd1
+	github.com/brotherlogic/recordsorganiser v0.0.0-20210826185725-9b8165799dda
 	github.com/golang/protobuf v1.5.2
+	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/procfs v0.7.3 // indirect
-	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d
-	golang.org/x/sys v0.0.0-20210817133320-13f9c583af74 // indirect
-	google.golang.org/genproto v0.0.0-20210816143620-e15ff196659d // indirect
+	golang.org/x/net v0.0.0-20210825183410-e898025ed96a
+	google.golang.org/genproto v0.0.0-20210828152312-66f60bf46e71 // indirect
 	google.golang.org/grpc v1.40.0
 	google.golang.org/protobuf v1.27.1
 )
