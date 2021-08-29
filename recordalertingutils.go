@@ -57,7 +57,7 @@ func (s *Server) assessRecord(ctx context.Context, r *pbrc.Record) error {
 
 		if r.GetMetadata().GetMoveFolder() == 812802 {
 			if fail {
-				return status.Errorf(codes.FailedPrecondition, "Record fails validation - please fix")
+				return status.Errorf(codes.FailedPrecondition, "Record %v fails validation - please fix", r.GetRelease().GetInstanceId())
 			}
 
 			if cleanFail != nil {
