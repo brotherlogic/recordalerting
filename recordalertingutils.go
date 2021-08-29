@@ -33,6 +33,10 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 			Type:        class,
 			IssueNumber: issue.GetNumber(),
 			InstanceId:  r.GetRelease().GetInstanceId()})
+		err = s.saveConfig(ctx, config)
+		if err != nil {
+			return err
+		}
 	} else if !needs && alreadySeen {
 		err := s.DeleteIssue(ctx, number)
 		if err != nil {
