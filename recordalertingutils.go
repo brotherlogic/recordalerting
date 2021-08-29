@@ -22,9 +22,11 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	// Does this record need a weight
 	needsWeight := r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetWeightInGrams() == 0
 	alreadySeen := false
+	var number int32
 	for _, problem := range config.GetProblems() {
 		if problem.GetType() == pb.Problem_MISSING_WEIGHT && problem.GetInstanceId() == r.GetRelease().GetInstanceId() {
 			alreadySeen = true
+			number = problem.GetIssueNumber()
 		}
 	}
 	if needsWeight && !alreadySeen {
@@ -37,6 +39,23 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 			Type:        pb.Problem_MISSING_WEIGHT,
 			IssueNumber: issue.GetNumber(),
 			InstanceId:  r.GetRelease().GetInstanceId()})
+	} else if !needsWeight && alreadySeen {
+		err := s.DeleteIssue(ctx, number)
+		if err != nil {
+			return err
+		}
+
+		var problems []*pb.Problem
+		for _, p := range config.GetProblems() {
+			if p.GetInstanceId() != r.GetRelease().GetInstanceId() || p.GetType() != pb.Problem_MISSING_WEIGHT {
+				problems = append(problems, p)
+			}
+		}
+		config.Problems = problems
+		err = s.saveConfig(ctx, config)
+		if err != nil {
+			return err
+		}
 	}
 
 	s.validateRecord(r)
