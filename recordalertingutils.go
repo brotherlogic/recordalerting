@@ -80,17 +80,17 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 		return nil
 	}
 
-	err := s.needsFiled(ctx, config, r)
-	if err != nil {
-		return err
+	err1 := s.needsFiled(ctx, config, r)
+	err2 := s.needsWeight(ctx, config, r)
+	err3 := s.needsWidth(ctx, config, r)
+	if err1 != nil {
+		return err1
 	}
-	err = s.needsWeight(ctx, config, r)
-	if err != nil {
-		return err
+	if err2 != nil {
+		return err2
 	}
-	err = s.needsWidth(ctx, config, r)
-	if err != nil {
-		return err
+	if err3 != nil {
+		return err3
 	}
 
 	s.validateRecord(r)
