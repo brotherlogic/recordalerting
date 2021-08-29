@@ -14,6 +14,7 @@ message Problem {
         MISSING_WEIGHT = 1;
         MISSING_FILED = 2;
         MISSING_WIDTH = 3;
+        MISSING_CONDITION = 4;
     }
     ProblemType type = 1;
     int32 instance_id = 2;

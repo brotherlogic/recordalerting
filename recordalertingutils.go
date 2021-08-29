@@ -77,6 +77,11 @@ func (s *Server) needsFiled(ctx context.Context, config *pb.Config, r *pbrc.Reco
 		r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_UNKNOWN,
 		pb.Problem_MISSING_FILED, "needs filling")
 }
+func (s *Server) needsCondition(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	return s.adjustState(ctx, config, r,
+		r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetRelease().GetRecordCondition() == "",
+		pb.Problem_MISSING_CONDITION, "needs condition")
+}
 
 func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	// We don't alert on boxed records
@@ -87,6 +92,17 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	err1 := s.needsFiled(ctx, config, r)
 	err2 := s.needsWeight(ctx, config, r)
 	err3 := s.needsWidth(ctx, config, r)
+
+	// Only fail
+	if (r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_12_INCH || r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_7_INCH) && r.GetMetadata().GetSaleState() != gd.SaleState_SOLD {
+		if time.Since(time.Unix(r.GetMetadata().GetLastCleanDate(), 0)) > time.Hour*24*365*3 {
+			err := s.rc.clean(ctx, r.GetRelease().GetInstanceId())
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	if err1 != nil {
 		return err1
 	}
@@ -100,38 +116,6 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	s.validateRecord(r)
 	s.alertForMissingSaleID(r)
 	s.alertForPurgatory(r)
-
-	if r.GetMetadata().GetMoveFolder() == 812802 {
-		fail := false
-		var cleanFail error
-
-		//Physical properties don't apply to digital
-		if r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL {
-
-			// Note that condition is read on commit, so we can't fail this here
-			if r.GetRelease().GetRecordCondition() == "" {
-				s.RaiseIssue(fmt.Sprintf("%v needs condition", r.GetRelease().GetTitle()), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
-			}
-
-		}
-
-		// Only fail
-		if (r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_12_INCH || r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_7_INCH) && r.GetMetadata().GetSaleState() != gd.SaleState_SOLD {
-			if time.Since(time.Unix(r.GetMetadata().GetLastCleanDate(), 0)) > time.Hour*24*365*3 {
-				cleanFail = s.rc.clean(ctx, r.GetRelease().GetInstanceId())
-			}
-		}
-
-		if r.GetMetadata().GetMoveFolder() == 812802 {
-			if fail {
-				return status.Errorf(codes.FailedPrecondition, "Record %v fails validation - please fix", r.GetRelease().GetInstanceId())
-			}
-
-			if cleanFail != nil {
-				return cleanFail
-			}
-		}
-	}
 
 	return nil
 }
