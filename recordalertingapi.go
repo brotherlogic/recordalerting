@@ -1,8 +1,9 @@
 package main
 
 import (
-	rcpb "github.com/brotherlogic/recordcollection/proto"
 	"golang.org/x/net/context"
+
+	rcpb "github.com/brotherlogic/recordcollection/proto"
 )
 
 //ClientUpdate process new record
