@@ -80,15 +80,15 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 		return nil
 	}
 
-	err := s.needsWeight(ctx, config, r)
+	err := s.needsFiled(ctx, config, r)
+	if err != nil {
+		return err
+	}
+	err = s.needsWeight(ctx, config, r)
 	if err != nil {
 		return err
 	}
 	err = s.needsWidth(ctx, config, r)
-	if err != nil {
-		return err
-	}
-	err = s.needsFiled(ctx, config, r)
 	if err != nil {
 		return err
 	}
