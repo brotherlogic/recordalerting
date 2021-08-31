@@ -132,17 +132,6 @@ func (s *Server) validateRecord(r *pbrc.Record) {
 		s.RaiseIssue(fmt.Sprintf("%v Needs your Attention", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v is stuck staged to sell", r.GetRelease().GetTitle()))
 	}
 
-	if (len(r.GetRelease().GetRecordCondition()) == 0 || len(r.GetRelease().GetSleeveCondition()) == 0) &&
-		r.GetMetadata().GetGoalFolder() != 1782105 &&
-		r.GetMetadata().GetGoalFolder() != 1433217 &&
-		r.GetMetadata().GetGoalFolder() != 2274270 &&
-		r.GetMetadata().GetGoalFolder() != 268147 {
-		if r.GetRelease().GetFolderId() == 812802 {
-			s.alertCount++
-			s.RaiseIssue(fmt.Sprintf("%v Missing Condition", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v is missing conditions. Fix it here https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
-		}
-	}
-
 	if r.GetMetadata().GetGoalFolder() == 1613206 && r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_SOLD_ARCHIVE {
 		s.RaiseIssue(fmt.Sprintf("%v is marked as sold, but is not SOLD_ARCHIVE", r.GetRelease().GetInstanceId()), fmt.Sprintf("It's %v ->  https://www.discogs.com/madeup/release/%v", r.GetMetadata().GetCategory(), r.GetRelease().GetId()))
 	}
