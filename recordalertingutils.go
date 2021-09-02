@@ -38,6 +38,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 			return err
 		}
 	} else if !needs && alreadySeen {
+		s.Log(fmt.Sprintf("Deleting %v for %v", number, r.GetRelease().GetInstanceId()))
 		err := s.DeleteIssue(ctx, number)
 		if err != nil {
 			return err
