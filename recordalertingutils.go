@@ -94,6 +94,7 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	err1 := s.needsFiled(ctx, config, r)
 	err2 := s.needsWeight(ctx, config, r)
 	err3 := s.needsWidth(ctx, config, r)
+	err4 := s.needsCondition(ctx, config, r)
 
 	// Only fail
 	if (r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_12_INCH || r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_7_INCH) && r.GetMetadata().GetSaleState() != gd.SaleState_SOLD {
@@ -113,6 +114,9 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	}
 	if err3 != nil {
 		return err3
+	}
+	if err4 != nil {
+		return err4
 	}
 
 	s.validateRecord(r)
