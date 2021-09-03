@@ -24,7 +24,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 		}
 	}
 	if needs && !alreadySeen {
-		issue, err := s.ImmediateIssue(ctx, fmt.Sprintf("%v %v", r.GetRelease().GetTitle(), errorMessage), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
+		issue, err := s.ImmediateIssue(ctx, fmt.Sprintf("%v [%v] %v", r.GetRelease().GetTitle(), r.GetRelease().GetInstanceId(), errorMessage), fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId()))
 		if err != nil {
 			return err
 		}
