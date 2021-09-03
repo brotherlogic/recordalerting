@@ -66,12 +66,12 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 
 func (s *Server) needsWeight(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetWeightInGrams() == 0,
+		r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetWeightInGrams() == 0,
 		pb.Problem_MISSING_WEIGHT, "needs weight")
 }
 func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetRecordWidth() == 0,
+		r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetRecordWidth() == 0,
 		pb.Problem_MISSING_WIDTH, "needs width")
 }
 func (s *Server) needsFiled(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
@@ -81,7 +81,7 @@ func (s *Server) needsFiled(ctx context.Context, config *pb.Config, r *pbrc.Reco
 }
 func (s *Server) needsCondition(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetRelease().GetRecordCondition() == "",
+		r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetRelease().GetRecordCondition() == "",
 		pb.Problem_MISSING_CONDITION, "needs condition")
 }
 
