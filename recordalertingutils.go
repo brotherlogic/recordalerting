@@ -81,7 +81,7 @@ func (s *Server) needsFiled(ctx context.Context, config *pb.Config, r *pbrc.Reco
 }
 func (s *Server) needsCondition(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetRelease().GetRecordCondition() == "",
+		r.GetMetadata().GetDateArrived() > 0 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetRelease().GetRecordCondition() == "",
 		pb.Problem_MISSING_CONDITION, "needs condition")
 }
 
