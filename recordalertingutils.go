@@ -66,7 +66,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 
 func (s *Server) needsWeight(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetWeightInGrams() == 0,
+		r.GetMetadata().GetMoveFolder() == 488127 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetWeightInGrams() == 0,
 		pb.Problem_MISSING_WEIGHT, "needs weight")
 }
 func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
