@@ -157,7 +157,7 @@ func (s *Server) alertForMissingSaleID(r *pbrc.Record) {
 	}
 
 	//Also validate the current sale price
-	if r.GetMetadata().GetSalePriceUpdate() != 0 && time.Since(time.Unix(r.GetMetadata().GetSalePriceUpdate(), 0)) > time.Hour*24*30 && r.GetRelease().GetFolderId() == 812802 {
+	if r.GetMetadata().GetSalePriceUpdate() != 0 && time.Since(time.Unix(r.GetMetadata().GetSalePriceUpdate(), 0)) > time.Hour*24*30 && r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_LISTED_TO_SELL {
 		s.alertCount++
 		s.RaiseIssue(fmt.Sprintf("%v is a problematic record price", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v (%v) has not had a sale price update since %v", r.GetRelease().GetId(), r.GetRelease().GetInstanceId(), time.Unix(r.GetMetadata().GetSalePriceUpdate(), 0)))
 	}
