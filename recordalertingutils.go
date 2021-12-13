@@ -76,7 +76,7 @@ func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Reco
 }
 func (s *Server) needsFiled(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_UNKNOWN && (r.GetMetadata().GetNewBoxState() == pbrc.ReleaseMetadata_OUT_OF_BOX || (r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_OUT_OF_BOX && r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_BOX_UNKNOWN)),
+		r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_UNKNOWN && (r.GetMetadata().GetNewBoxState() == pbrc.ReleaseMetadata_OUT_OF_BOX || r.GetMetadata().GetBoxState() == pbrc.ReleaseMetadata_OUT_OF_BOX || r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_BOX_UNKNOWN),
 		pb.Problem_MISSING_FILED, "needs filling")
 }
 func (s *Server) needsCondition(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
