@@ -97,6 +97,8 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	err3 := s.needsWidth(ctx, config, r)
 	err4 := s.needsCondition(ctx, config, r)
 
+	s.CtxLog(ctx, fmt.Sprintf("Run assess: %v, %v, %v, %v", err1, err2, err3, err4))
+
 	// Only fail
 	if r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNKNOWN {
 		if (r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_12_INCH || r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_7_INCH) && r.GetMetadata().GetSaleState() != gd.SaleState_SOLD && r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_SOLD_ARCHIVE {
