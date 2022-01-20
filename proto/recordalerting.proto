@@ -15,6 +15,7 @@ message Problem {
         MISSING_FILED = 2;
         MISSING_WIDTH = 3;
         MISSING_CONDITION = 4;
+        MISSING_SLEEVE = 5;
     }
     ProblemType type = 1;
     int32 instance_id = 2;
