@@ -66,7 +66,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 
 func (s *Server) needsWeight(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetMoveFolder() == 488127 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetWeightInGrams() == 0,
+		r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_STAGED_TO_SELL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetWeightInGrams() == 0,
 		pb.Problem_MISSING_WEIGHT, "needs weight")
 }
 func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
@@ -107,7 +107,7 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	err4 := s.needsCondition(ctx, config, r)
 	err5 := s.needsSleeve(ctx, config, r)
 
-	s.CtxLog(ctx, fmt.Sprintf("Run assess: %v, %v, %v, %v, %v", err1, err2, err3, err4.err5))
+	s.CtxLog(ctx, fmt.Sprintf("Run assess: %v, %v, %v, %v, %v", err1, err2, err3, err4, err5))
 
 	// Only fail
 	if r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNKNOWN {
