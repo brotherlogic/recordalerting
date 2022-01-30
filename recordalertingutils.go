@@ -58,7 +58,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 		}
 	}
 
-	if needs && (class == pb.Problem_MISSING_WEIGHT || class == pb.Problem_MISSING_WIDTH || class == pb.Problem_MISSING_FILED) {
+	if needs && (class == pb.Problem_MISSING_WEIGHT || class == pb.Problem_MISSING_WIDTH || class == pb.Problem_MISSING_FILED || class == pb.Problem_MISSING_SLEEVE) {
 		return status.Errorf(codes.FailedPrecondition, "Record %v fails validation - please fix", r.GetRelease().GetInstanceId())
 	}
 	return nil
