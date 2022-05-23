@@ -27,9 +27,10 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 	if needs && !alreadySeen {
 		location, err := locator.ReadableLocation(ctx, r.GetRelease().GetInstanceId())
 		detail := fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v\n", r.GetRelease().GetInstanceId(), r.GetRelease().GetId())
-		if err != nil {
+		if err == nil {
 			detail = fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v\nLocation: \n%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId(), location)
 		}
+		s.CtxLog(ctx, "Error reading location: %v", err)
 		issue, err := s.ImmediateIssue(ctx, fmt.Sprintf("%v [%v] %v", r.GetRelease().GetTitle(), r.GetRelease().GetInstanceId(), errorMessage), detail)
 		if err != nil {
 			return err
