@@ -27,7 +27,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 	if needs && !alreadySeen {
 		location, err := locator.ReadableLocation(ctx, s.FDialServer, r.GetRelease().GetInstanceId(), true)
 		detail := fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v\n", r.GetRelease().GetInstanceId(), r.GetRelease().GetId())
-		if err == nil {
+		if err == nil && class == pb.Problem_MISSING_FILED {
 			detail = fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v\nLocation: \n%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId(), location)
 		}
 		s.CtxLog(ctx, fmt.Sprintf("Error reading location: %v -> %v", err, location))
