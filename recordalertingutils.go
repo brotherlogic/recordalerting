@@ -113,6 +113,11 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 		return nil
 	}
 
+	// We don't alert on parents records
+	if r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_PARENTS {
+		return nil
+	}
+
 	err1 := s.needsFiled(ctx, config, r)
 	err2 := s.needsWeight(ctx, config, r)
 	err3 := s.needsWidth(ctx, config, r)
