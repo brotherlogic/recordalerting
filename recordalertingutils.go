@@ -114,7 +114,7 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	}
 
 	// We don't alert on parents records
-	if r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_PARENTS {
+	if r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_PARENTS || r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_SOLD_ARCHIVE {
 		return nil
 	}
 
