@@ -107,7 +107,7 @@ func (s *Server) needsCondition(ctx context.Context, config *pb.Config, r *pbrc.
 
 func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	// We don't alert on boxed records
-	s.CtxLog(ctx, fmt.Sprintf("Assessing %v", r))
+	s.CtxLog(ctx, fmt.Sprintf("Assessing the %v", r))
 	if r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_OUT_OF_BOX && r.GetMetadata().GetBoxState() != pbrc.ReleaseMetadata_BOX_UNKNOWN {
 		s.CtxLog(ctx, fmt.Sprintf("Quitting early because of boxstate: %v", r.GetMetadata().GetBoxState()))
 		return nil
