@@ -16,6 +16,8 @@ message Problem {
         MISSING_WIDTH = 3;
         MISSING_CONDITION = 4;
         MISSING_SLEEVE = 5;
+        NEEDS_KEEPER = 6;
+        NEEDS_DIGITAL = 7;
     }
     ProblemType type = 1;
     int32 instance_id = 2;

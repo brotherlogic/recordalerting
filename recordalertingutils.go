@@ -90,6 +90,17 @@ func (s *Server) needsSleeve(ctx context.Context, config *pb.Config, r *pbrc.Rec
 		r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetSleeve() == pbrc.ReleaseMetadata_SLEEVE_UNKNOWN,
 		pb.Problem_MISSING_SLEEVE, "needs sleeve")
 }
+
+func (s *Server) needsKeeperJudgement(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	return s.adjustState(ctx, config, r,
+		r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_IN_COLLECTION && r.GetRelease().GetRating() <= 4, pb.Problem_NEEDS_KEEPER, "needs keeper judgement")
+}
+
+func (s *Server) needsDigitalAssess(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	return s.adjustState(ctx, config, r,
+		r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_IN_COLLECTION && r.GetRelease().GetRating() <= 4 && r.GetMetadata().GetDigitalAvailability() == pbrc.ReleaseMetadata_AVAILABILITY_UNKNOWN, pb.Problem_NEEDS_DIGITAL, "needs digital avail")
+}
+
 func (s *Server) needsFiled(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	s.CtxLog(ctx, fmt.Sprintf("1: %v", r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_UNKNOWN))
 	s.CtxLog(ctx, fmt.Sprintf("2: %v", r.GetMetadata().GetNewBoxState() == pbrc.ReleaseMetadata_OUT_OF_BOX))
@@ -123,8 +134,10 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	err3 := s.needsWidth(ctx, config, r)
 	err4 := s.needsCondition(ctx, config, r)
 	err5 := s.needsSleeve(ctx, config, r)
+	err6 := s.needsDigitalAssess(ctx, config, r)
+	err7 := s.needsKeeperJudgement(ctx, config, r)
 
-	s.CtxLog(ctx, fmt.Sprintf("Run assess: %v, %v, %v, %v, %v", err1, err2, err3, err4, err5))
+	s.CtxLog(ctx, fmt.Sprintf("Run assess: %v, %v, %v, %v, %v, %v, %v", err1, err2, err3, err4, err5, err6, err7))
 
 	// Only fail
 	if r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNKNOWN {
@@ -152,6 +165,12 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	}
 	if err5 != nil {
 		return err5
+	}
+	if err6 != nil {
+		return err6
+	}
+	if err7 != nil {
+		return err7
 	}
 
 	s.validateRecord(r)
