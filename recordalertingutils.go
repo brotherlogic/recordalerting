@@ -95,12 +95,12 @@ func (s *Server) needsSleeve(ctx context.Context, config *pb.Config, r *pbrc.Rec
 
 func (s *Server) needsKeeperJudgement(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_IN_COLLECTION && r.GetRelease().GetRating() <= 4 && r.GetMetadata().GetKeep() == pbrc.ReleaseMetadata_KEEP_UNKNOWN, pb.Problem_NEEDS_KEEPER, "needs keeper judgement")
+		r.GetRelease().GetFolderId() == 812802 && r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_IN_COLLECTION && r.GetRelease().GetRating() <= 4 && r.GetMetadata().GetKeep() == pbrc.ReleaseMetadata_KEEP_UNKNOWN, pb.Problem_NEEDS_KEEPER, "needs keeper judgement")
 }
 
 func (s *Server) needsDigitalAssess(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_IN_COLLECTION && r.GetRelease().GetRating() <= 4 && r.GetMetadata().GetDigitalAvailability() == pbrc.ReleaseMetadata_AVAILABILITY_UNKNOWN, pb.Problem_NEEDS_DIGITAL, "needs digital avail")
+		r.GetRelease().GetFolderId() == 812802 && r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_IN_COLLECTION && r.GetRelease().GetRating() <= 4 && r.GetMetadata().GetDigitalAvailability() == pbrc.ReleaseMetadata_AVAILABILITY_UNKNOWN, pb.Problem_NEEDS_DIGITAL, "needs digital avail")
 }
 
 func (s *Server) needsFiled(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
