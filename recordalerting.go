@@ -15,6 +15,8 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 
+	dsc "github.com/brotherlogic/dstore/client"
+
 	dspb "github.com/brotherlogic/dstore/proto"
 	gdpb "github.com/brotherlogic/godiscogs"
 	pbg "github.com/brotherlogic/goserver/proto"
@@ -113,14 +115,7 @@ func (gh *prodRC) clean(ctx context.Context, i int32) error {
 }
 
 func (s *Server) loadConfig(ctx context.Context) (*pb.Config, error) {
-	conn, err := s.FDialServer(ctx, "dstore")
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-
-	client := dspb.NewDStoreServiceClient(conn)
-	res, err := client.Read(ctx, &dspb.ReadRequest{Key: CONFIG_KEY})
+	res, err := s.dstoreClient.Read(ctx, &dspb.ReadRequest{Key: CONFIG_KEY})
 	if err != nil {
 		if status.Convert(err).Code() == codes.NotFound {
 			return &pb.Config{}, nil
@@ -146,19 +141,11 @@ func (s *Server) loadConfig(ctx context.Context) (*pb.Config, error) {
 }
 
 func (s *Server) saveConfig(ctx context.Context, config *pb.Config) error {
-	conn, err := s.FDialServer(ctx, "dstore")
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
 	data, err := proto.Marshal(config)
 	if err != nil {
 		return err
 	}
-
-	client := dspb.NewDStoreServiceClient(conn)
-	res, err := client.Write(ctx, &dspb.WriteRequest{Key: CONFIG_KEY, Value: &google_protobuf.Any{Value: data}})
+	res, err := s.dstoreClient.Write(ctx, &dspb.WriteRequest{Key: CONFIG_KEY, Value: &google_protobuf.Any{Value: data}})
 	if err != nil {
 		return err
 	}
@@ -226,6 +213,7 @@ type Server struct {
 	ro             ro
 	invalidRecords int
 	alertCount     int
+	dstoreClient   *dsc.DStoreClient
 }
 
 // Init builds the server
