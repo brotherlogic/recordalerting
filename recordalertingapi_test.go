@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"testing"
 
 	"golang.org/x/net/context"
 
@@ -42,6 +43,12 @@ type testRc struct {
 	order   bool
 	missing bool
 	failAll bool
+	iidMap  map[int32]*pbrc.Record
+}
+
+func (rc *testRc) addRecord(iid int32, r *pbrc.Record) {
+	r.GetRelease().InstanceId = iid
+	rc.iidMap[iid] = r
 }
 
 func (rc *testRc) clean(ctx context.Context, instanceID int32) error {
@@ -118,5 +125,36 @@ func (rc *testRc) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
 		&pbrc.Record{Release: &pbgd.Release{Title: "Jazz Moderne"}},
 		&pbrc.Record{Release: &pbgd.Release{Title: "Sports Et Action"}},
 	}, nil
+}
 
+func TestFilledRecordIntoCollectionButNoDigital(t *testing.T) {
+	/*s, rc := InitTest()
+
+	// Record is moving from listening pile into collection
+	rc.addRecord(1234, &pbrc.Record{
+		Release: &pbgd.Release{FolderId: 812802},
+		Metadata: &pbrc.ReleaseMetadata{
+			GoalFolder: 242017,
+			Category:   pbrc.ReleaseMetadata_IN_COLLECTION,
+		},
+	})
+
+	_, err := s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: 1234})
+	if err == nil {
+		t.Errorf("We expected this to be an error condition")
+	}
+
+	rc.addRecord(1234, &pbrc.Record{
+		Release: &pbgd.Release{FolderId: 812802},
+		Metadata: &pbrc.ReleaseMetadata{
+			GoalFolder:    242017,
+			Category:      pbrc.ReleaseMetadata_IN_COLLECTION,
+			WeightInGrams: 300,
+		},
+	})
+
+	_, err = s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: 1234})
+	if err != nil {
+		t.Errorf("An unexpected error on this move: %v", err)
+	}*/
 }
