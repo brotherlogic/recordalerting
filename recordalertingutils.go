@@ -31,7 +31,8 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 			detail = fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v\nLocation: \n%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId(), location)
 		}
 		s.CtxLog(ctx, fmt.Sprintf("Error reading location: %v -> %v", err, location))
-		issue, err := s.ImmediateIssue(ctx, fmt.Sprintf("%v [%v] %v", r.GetRelease().GetTitle(), r.GetRelease().GetInstanceId(), errorMessage), detail, class == pb.Problem_MISSING_FILED)
+		issue, err := s.ImmediateIssue(ctx, fmt.Sprintf("%v [%v] %v", r.GetRelease().GetTitle(), r.GetRelease().GetInstanceId(), errorMessage), detail,
+			(class == pb.Problem_MISSING_FILED || class == pb.Problem_MISSING_WEIGHT))
 		if err != nil {
 			return err
 		}
