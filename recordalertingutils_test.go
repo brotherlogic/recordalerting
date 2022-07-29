@@ -43,12 +43,13 @@ func TestPurgatoryFail(t *testing.T) {
 
 }
 
-func InitTest() *Server {
+func InitTest() (*Server, *testRc) {
 	s := Init()
 	s.SkipLog = true
 	s.SkipIssue = true
-	s.rc = &testRc{}
+	trc := &testRc{iidMap: make(map[int32]*pbrc.Record)}
+	s.rc = trc
 	s.ro = &testRo{}
 
-	return s
+	return s, trc
 }
