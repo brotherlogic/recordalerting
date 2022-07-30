@@ -3,7 +3,7 @@ module github.com/brotherlogic/recordalerting
 go 1.16
 
 require (
-	github.com/brotherlogic/dstore v0.0.0-20220729235216-263cd9ee1ab5
+	github.com/brotherlogic/dstore v0.0.0-20220730000106-503f7fc0f5ea
 	github.com/brotherlogic/godiscogs v0.0.0-20220722012105-93cf4f2124d9
 	github.com/brotherlogic/goserver v0.0.0-20220729221422-7d1d05b1f113
 	github.com/brotherlogic/logging v0.0.0-20220725170352-7ef057d40c44 // indirect
