@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"testing"
 	"time"
 
+	pbds "github.com/brotherlogic/dstore/client"
 	pbgd "github.com/brotherlogic/godiscogs"
+	pb "github.com/brotherlogic/recordalerting/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 )
 
@@ -50,6 +53,11 @@ func InitTest() (*Server, *testRc) {
 	trc := &testRc{iidMap: make(map[int32]*pbrc.Record)}
 	s.rc = trc
 	s.ro = &testRo{}
+
+	s.dstoreClient = &pbds.DStoreClient{Test: true}
+
+	// Init an empty config
+	s.saveConfig(context.Background(), &pb.Config{})
 
 	return s, trc
 }

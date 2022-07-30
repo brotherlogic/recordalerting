@@ -221,6 +221,7 @@ func Init() *Server {
 	s := &Server{GoServer: &goserver.GoServer{}}
 	s.rc = &prodRC{s.FDialServer}
 	s.ro = &prodRO{s.FDialServer}
+
 	return s
 }
 

@@ -56,6 +56,9 @@ func (rc *testRc) clean(ctx context.Context, instanceID int32) error {
 }
 
 func (rc *testRc) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
+	if val, ok := rc.iidMap[instanceID]; ok {
+		return val, nil
+	}
 	if rc.fail || rc.failAll {
 		return nil, fmt.Errorf("Built to fail")
 	}
@@ -127,15 +130,16 @@ func (rc *testRc) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error)
 	}, nil
 }
 
-func TestFilledRecordIntoCollectionButNoDigital(t *testing.T) {
-	/*s, rc := InitTest()
+func TestFilledRecordIntoCollectionButNoWeight(t *testing.T) {
+	s, rc := InitTest()
 
 	// Record is moving from listening pile into collection
 	rc.addRecord(1234, &pbrc.Record{
-		Release: &pbgd.Release{FolderId: 812802},
+		Release: &pbgd.Release{FolderId: 812802, Rating: 5},
 		Metadata: &pbrc.ReleaseMetadata{
-			GoalFolder: 242017,
+			MoveFolder: 242017,
 			Category:   pbrc.ReleaseMetadata_IN_COLLECTION,
+			FiledUnder: pbrc.ReleaseMetadata_FILE_12_INCH,
 		},
 	})
 
@@ -145,16 +149,17 @@ func TestFilledRecordIntoCollectionButNoDigital(t *testing.T) {
 	}
 
 	rc.addRecord(1234, &pbrc.Record{
-		Release: &pbgd.Release{FolderId: 812802},
+		Release: &pbgd.Release{FolderId: 812802, Rating: 5},
 		Metadata: &pbrc.ReleaseMetadata{
-			GoalFolder:    242017,
+			MoveFolder:    242017,
 			Category:      pbrc.ReleaseMetadata_IN_COLLECTION,
 			WeightInGrams: 300,
+			FiledUnder:    pbrc.ReleaseMetadata_FILE_12_INCH,
 		},
 	})
 
 	_, err = s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: 1234})
 	if err != nil {
 		t.Errorf("An unexpected error on this move: %v", err)
-	}*/
+	}
 }

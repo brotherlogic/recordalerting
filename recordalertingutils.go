@@ -25,12 +25,16 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 		}
 	}
 	if needs && !alreadySeen {
-		location, err := locator.ReadableLocation(ctx, s.FDialServer, r.GetRelease().GetInstanceId(), true)
 		detail := fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v\n", r.GetRelease().GetInstanceId(), r.GetRelease().GetId())
-		if err == nil && class == pb.Problem_MISSING_FILED {
-			detail = fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v\nLocation: \n%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId(), location)
+		if class == pb.Problem_MISSING_FILED {
+			location, err := locator.ReadableLocation(ctx, s.FDialServer, r.GetRelease().GetInstanceId(), true)
+			if err == nil {
+				detail = fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v\nLocation: \n%v", r.GetRelease().GetInstanceId(), r.GetRelease().GetId(), location)
+			} else {
+				s.CtxLog(ctx, fmt.Sprintf("Error reading location: %v -> %v", err, location))
+			}
 		}
-		s.CtxLog(ctx, fmt.Sprintf("Error reading location: %v -> %v", err, location))
+
 		issue, err := s.ImmediateIssue(ctx, fmt.Sprintf("%v [%v] %v", r.GetRelease().GetTitle(), r.GetRelease().GetInstanceId(), errorMessage), detail,
 			(class == pb.Problem_MISSING_FILED || class == pb.Problem_MISSING_WEIGHT))
 		if err != nil {
@@ -73,14 +77,16 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 			class == pb.Problem_NEEDS_DIGITAL ||
 			class == pb.Problem_NEEDS_KEEPER ||
 			class == pb.Problem_MISSING_SLEEVE) {
-		return status.Errorf(codes.FailedPrecondition, "Record %v fails validation - please fix", r.GetRelease().GetInstanceId())
+		return status.Errorf(codes.FailedPrecondition, "Record %v fails validation - please fix (%v)", r.GetRelease().GetInstanceId(), class)
 	}
 	return nil
 }
 
 func (s *Server) needsWeight(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	s.Log(fmt.Sprintf("HERE %v, %v and %v", r.GetRelease().GetFolderId(), r.GetMetadata().GetMoveFolder(), r.GetMetadata().GetWeightInGrams()))
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_SOLD && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetWeightInGrams() == 0,
+		(r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_SOLD && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetWeightInGrams() == 0) ||
+			(r.GetRelease().GetFolderId() == 812802 && r.GetMetadata().GetMoveFolder() > 0 && r.GetMetadata().GetWeightInGrams() == 0),
 		pb.Problem_MISSING_WEIGHT, "needs weight")
 }
 func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
