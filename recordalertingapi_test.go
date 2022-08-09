@@ -201,3 +201,23 @@ func TestFilledRecordIntoCollectionButNoDigitalKeep(t *testing.T) {
 		t.Errorf("An unexpected error on this move: %v", err)
 	}
 }
+
+func TestFilledDigitalIntoCollectionButNoDigitalKeep(t *testing.T) {
+	s, rc := InitTest()
+
+	// Record is moving from listening pile into collection
+	rc.addRecord(1234, &pbrc.Record{
+		Release: &pbgd.Release{FolderId: 812802, Rating: 5},
+		Metadata: &pbrc.ReleaseMetadata{
+			MoveFolder:    242017,
+			Category:      pbrc.ReleaseMetadata_IN_COLLECTION,
+			FiledUnder:    pbrc.ReleaseMetadata_FILE_DIGITAL,
+			WeightInGrams: 300,
+		},
+	})
+
+	_, err := s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: 1234})
+	if err != nil {
+		t.Errorf("This should be fine but returned an error: %v", err)
+	}
+}
