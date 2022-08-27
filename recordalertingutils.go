@@ -51,7 +51,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 		}
 	} else if !needs && alreadySeen {
 		err := s.DeleteIssue(ctx, number)
-		s.Log(fmt.Sprintf("Deleting the record %v for %v -> %v", number, r.GetRelease().GetInstanceId(), err))
+		s.CtxLog(ctx, fmt.Sprintf("Deleting the record %v for %v -> %v", number, r.GetRelease().GetInstanceId(), err))
 
 		if err != nil {
 			return err
@@ -83,7 +83,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 }
 
 func (s *Server) needsWeight(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
-	s.Log(fmt.Sprintf("HERE %v, %v and %v", r.GetRelease().GetFolderId(), r.GetMetadata().GetMoveFolder(), r.GetMetadata().GetWeightInGrams()))
+	s.CtxLog(ctx, fmt.Sprintf("HERE %v, %v and %v", r.GetRelease().GetFolderId(), r.GetMetadata().GetMoveFolder(), r.GetMetadata().GetWeightInGrams()))
 	return s.adjustState(ctx, config, r,
 		(r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_SOLD && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetWeightInGrams() == 0) ||
 			(r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetRelease().GetFolderId() == 812802 && r.GetMetadata().GetMoveFolder() > 0 && r.GetMetadata().GetWeightInGrams() == 0),
