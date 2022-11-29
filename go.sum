@@ -574,7 +574,6 @@ github.com/brotherlogic/discovery v0.0.0-20221031222634-46e85338d447/go.mod h1:1
 github.com/brotherlogic/discovery v0.0.0-20221101214734-1b56bc33253a/go.mod h1:PL5UgDvHSCK0GeZ9MxMOvAefUZBb1ZsygBzek/tu8qA=
 github.com/brotherlogic/discovery v0.0.0-20221102131626-ad0701835a27/go.mod h1:PL5UgDvHSCK0GeZ9MxMOvAefUZBb1ZsygBzek/tu8qA=
 github.com/brotherlogic/discovery v0.0.0-20221128044228-c1d428adb034/go.mod h1:CtmBTyhDDd5vun3SFLZzwkDSlSI+SBp4ZgQeAgCjcOc=
-github.com/brotherlogic/discovery v0.0.0-20221129050818-9bfbf289ffb5/go.mod h1:8xNiLB+6cThEVWBsEPnU/wrZsSoq7OfnBgSVYiMV7qk=
 github.com/brotherlogic/discovery v0.0.0-20221129052745-a11eef165a08 h1:QXi0f7uYTDYcDAnyJSs0au5kLeqXGXdXB8z1KCj71Pk=
 github.com/brotherlogic/discovery v0.0.0-20221129052745-a11eef165a08/go.mod h1:DV4HCtqrr35sdzfqBGXNLmA9jnafH1XbvFmDIkKinSk=
 github.com/brotherlogic/dstore v0.0.0-20210705011309-803d7db560a6/go.mod h1:SJdI/5dxubp66yy6slmUfen5yCIKXFvAmMs71u9xVrk=
@@ -1433,8 +1432,8 @@ github.com/brotherlogic/recordsorganiser v0.0.0-20221128050901-c8a55c0c4351/go.m
 github.com/brotherlogic/recordsorganiser v0.0.0-20221128051702-cf1730950c00/go.mod h1:yfIY69m2VSQoqc2qvjnblFWb+ieznDgcvleyVqChxhI=
 github.com/brotherlogic/recordsorganiser v0.0.0-20221128053006-c39d19e82355/go.mod h1:dgQOuuZaplP1pMa97s0zoOXK53m3fi8+Zq0FbMbGmfw=
 github.com/brotherlogic/recordsorganiser v0.0.0-20221128055437-aac70b65fac4/go.mod h1:GrnvZpy+Cv4J7dbZ9PRR6uginiWlmPYOjWSKDDMmZeg=
-github.com/brotherlogic/recordsorganiser v0.0.0-20221129052426-085a93ad467c h1:yLe7egyzNCRdbghNdA8ZfxcQ+6W5ADMgz9FtJ/DaNCI=
-github.com/brotherlogic/recordsorganiser v0.0.0-20221129052426-085a93ad467c/go.mod h1:qp+VZmGUIrM7kAlvkuP64YwRQJfteGR3kCwSLiu0aWk=
+github.com/brotherlogic/recordsorganiser v0.0.0-20221129053806-0bb3746002b8 h1:mBBQ1ygog1KIKxJeTG0C/M5iMi1Co0zpqM3EX+mQiWY=
+github.com/brotherlogic/recordsorganiser v0.0.0-20221129053806-0bb3746002b8/go.mod h1:TE6ZwFcDrHFJlOPqWBxUrzA++KVslKr3+4JIB7uk1u4=
 github.com/brotherlogic/recordwants v0.0.0-20210918164032-9da04d53cbf1/go.mod h1:IRkZBOav31NWTwWvMRVq3ttruarwBQe3ZWHslWjSmI4=
 github.com/brotherlogic/recordwants v0.0.0-20210918190859-49fa2a64cd32/go.mod h1:Y8JZ4SDM/W4+rQRQgjj89wG3AizbjYfNq5Bt9tltR8Q=
 github.com/brotherlogic/recordwants v0.0.0-20211008225925-8a8f9e0a9e6d/go.mod h1:Y8JZ4SDM/W4+rQRQgjj89wG3AizbjYfNq5Bt9tltR8Q=
