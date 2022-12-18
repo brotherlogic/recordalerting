@@ -3,11 +3,11 @@ module github.com/brotherlogic/recordalerting
 go 1.16
 
 require (
-	github.com/brotherlogic/dstore v0.0.0-20221209194838-9d0611d5184d
+	github.com/brotherlogic/dstore v0.0.0-20221218025114-6e4b20119499
 	github.com/brotherlogic/godiscogs v0.0.0-20221025153630-9ad31d9fab21
-	github.com/brotherlogic/goserver v0.0.0-20221202193151-b0b39691c212
-	github.com/brotherlogic/recordcollection v0.0.0-20221211023519-5b8d6fb1efc2
-	github.com/brotherlogic/recordsorganiser v0.0.0-20221211030048-fe48f12a592c
+	github.com/brotherlogic/goserver v0.0.0-20221217002224-0ba5c0213be1
+	github.com/brotherlogic/recordcollection v0.0.0-20221218034102-7c355782c977
+	github.com/brotherlogic/recordsorganiser v0.0.0-20221218033229-4b53ee46e394
 	github.com/golang/protobuf v1.5.2
 	github.com/prometheus/client_golang v1.14.0
 	golang.org/x/net v0.4.0
