@@ -1997,8 +1997,8 @@ github.com/brotherlogic/recordsorganiser v0.0.0-20221225043422-8d5f80f32747/go.m
 github.com/brotherlogic/recordsorganiser v0.0.0-20221225045927-e298b119b4fe/go.mod h1:FikCr6ESFp/p4/VsnvtLN+jlCcJQaPQuXanFgKvnTYU=
 github.com/brotherlogic/recordsorganiser v0.0.0-20221225050336-c33b65ee234b/go.mod h1:NeSXbtJiBFCbghucjA3Kp780PQPBC/+BwaE3jWHQ30Q=
 github.com/brotherlogic/recordsorganiser v0.0.0-20221225052502-066472a171d0/go.mod h1:+PJE157r6K5OC7BIouKnsOytabYGDwgEXBv33VxEbtU=
-github.com/brotherlogic/recordsorganiser v0.0.0-20230101073158-41a94ee4cae2 h1:I1n1a/J8zpMOyQDQV3AnOjsBKg6/7HzNVMGyqi0OXHw=
-github.com/brotherlogic/recordsorganiser v0.0.0-20230101073158-41a94ee4cae2/go.mod h1:v9VVKEM5fZgSpC41PBZCUP4pzIMjQse70OT69kATJ2A=
+github.com/brotherlogic/recordsorganiser v0.0.0-20230101073923-bf3833752f62 h1:yAPScsK9T5djNIkTZOJ1ymx4Z2fOXGS2xLtc5n1RKws=
+github.com/brotherlogic/recordsorganiser v0.0.0-20230101073923-bf3833752f62/go.mod h1:a3dS52K1fvlft5LtGuiipE0XupVanS0Y57uuBJTY7UU=
 github.com/brotherlogic/recordwants v0.0.0-20210918164032-9da04d53cbf1/go.mod h1:IRkZBOav31NWTwWvMRVq3ttruarwBQe3ZWHslWjSmI4=
 github.com/brotherlogic/recordwants v0.0.0-20210918190859-49fa2a64cd32/go.mod h1:Y8JZ4SDM/W4+rQRQgjj89wG3AizbjYfNq5Bt9tltR8Q=
 github.com/brotherlogic/recordwants v0.0.0-20211008225925-8a8f9e0a9e6d/go.mod h1:Y8JZ4SDM/W4+rQRQgjj89wG3AizbjYfNq5Bt9tltR8Q=
