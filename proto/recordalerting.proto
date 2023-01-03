@@ -18,6 +18,7 @@ message Problem {
         MISSING_SLEEVE = 5;
         NEEDS_KEEPER = 6;
         NEEDS_DIGITAL = 7;
+        NEEDS_SALE_BUDGET = 8;
     }
     ProblemType type = 1;
     int32 instance_id = 2;

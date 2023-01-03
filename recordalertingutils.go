@@ -94,6 +94,13 @@ func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Reco
 		r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetRecordWidth() <= 0,
 		pb.Problem_MISSING_WIDTH, "needs width")
 }
+
+func (s *Server) needsSaleBudget(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	return s.adjustState(ctx, config, r,
+		r.GetMetadata().GetMoveFolder() == 1613206 && r.GetMetadata().GetSaleBudget() == "",
+		pb.Problem_NEEDS_SALE_BUDGET, "needs sale budget")
+}
+
 func (s *Server) needsSleeve(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
 		r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FileSize(pbrc.ReleaseMetadata_VINYL_STORAGE_NO_INNER) && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetSleeve() == pbrc.ReleaseMetadata_SLEEVE_UNKNOWN,
@@ -145,6 +152,7 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	err5 := s.needsSleeve(ctx, config, r)
 	err6 := s.needsDigitalAssess(ctx, config, r)
 	err7 := s.needsKeeperJudgement(ctx, config, r)
+	err8 := s.needsSaleBudget(ctx, config, r)
 
 	s.CtxLog(ctx, fmt.Sprintf("Run assess: %v, %v, %v, %v, %v, %v, %v", err1, err2, err3, err4, err5, err6, err7))
 
@@ -182,6 +190,10 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	}
 	if err7 != nil {
 		return err7
+	}
+
+	if err8 != nil {
+		return err8
 	}
 
 	s.validateRecord(r)
