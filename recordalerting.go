@@ -18,7 +18,7 @@ import (
 	dsc "github.com/brotherlogic/dstore/client"
 
 	dspb "github.com/brotherlogic/dstore/proto"
-	gdpb "github.com/brotherlogic/godiscogs"
+	gdpb "github.com/brotherlogic/godiscogs/proto"
 	pbg "github.com/brotherlogic/goserver/proto"
 	pb "github.com/brotherlogic/recordalerting/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"

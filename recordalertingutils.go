@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	gd "github.com/brotherlogic/godiscogs"
+	gd "github.com/brotherlogic/godiscogs/proto"
 	pb "github.com/brotherlogic/recordalerting/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 )
@@ -36,7 +36,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 		}
 
 		issue, err := s.ImmediateIssue(ctx, fmt.Sprintf("%v [%v] %v", r.GetRelease().GetTitle(), r.GetRelease().GetInstanceId(), errorMessage), detail,
-			(class == pb.Problem_MISSING_FILED || class == pb.Problem_MISSING_WEIGHT))
+			(class == pb.Problem_MISSING_FILED || class == pb.Problem_MISSING_WEIGHT), true)
 		if err != nil {
 			return err
 		}
