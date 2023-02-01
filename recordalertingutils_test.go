@@ -6,7 +6,7 @@ import (
 	"time"
 
 	pbds "github.com/brotherlogic/dstore/client"
-	pbgd "github.com/brotherlogic/godiscogs"
+	pbgd "github.com/brotherlogic/godiscogs/proto"
 	pb "github.com/brotherlogic/recordalerting/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 )

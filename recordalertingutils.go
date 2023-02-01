@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	gd "github.com/brotherlogic/godiscogs"
+	gd "github.com/brotherlogic/godiscogs/proto"
 	pb "github.com/brotherlogic/recordalerting/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 )
