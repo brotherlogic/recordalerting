@@ -20,6 +20,7 @@ message Problem {
         NEEDS_DIGITAL = 7;
         NEEDS_SALE_BUDGET = 8;
         NEEDS_SOLD_DETAILS = 9;
+        BAD_BANDCAMP = 10;
     }
     ProblemType type = 1;
     int32 instance_id = 2;

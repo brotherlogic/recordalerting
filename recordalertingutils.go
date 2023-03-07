@@ -77,6 +77,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 			class == pb.Problem_NEEDS_DIGITAL ||
 			class == pb.Problem_NEEDS_KEEPER ||
 			class == pb.Problem_NEEDS_SOLD_DETAILS ||
+			class == pb.Problem_BAD_BANDCAMP ||
 			class == pb.Problem_MISSING_SLEEVE) {
 		return status.Errorf(codes.FailedPrecondition, "Record %v fails validation - please fix (%v)", r.GetRelease().GetInstanceId(), class)
 	}
@@ -94,6 +95,19 @@ func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Reco
 	return s.adjustState(ctx, config, r,
 		r.GetMetadata().GetMoveFolder() == 812802 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN && r.GetMetadata().GetRecordWidth() <= 0,
 		pb.Problem_MISSING_WIDTH, "needs width")
+}
+
+func (s *Server) badBandcamp(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	file := false
+	for _, format := range r.GetRelease().GetFormats() {
+		if format.GetName() == "WAV" {
+			file = true
+		}
+	}
+
+	return s.adjustState(ctx, config, r,
+		r.GetMetadata().GetGoalFolder() == 1782105 && !file,
+		pb.Problem_BAD_BANDCAMP, "bad bandcamp")
 }
 
 func (s *Server) needsSaleBudget(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
@@ -161,6 +175,7 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	err7 := s.needsKeeperJudgement(ctx, config, r)
 	err8 := s.needsSaleBudget(ctx, config, r)
 	err9 := s.needsSold(ctx, config, r)
+	err10 := s.badBandcamp(ctx, config, r)
 
 	s.CtxLog(ctx, fmt.Sprintf("Run assess: %v, %v, %v, %v, %v, %v, %v", err1, err2, err3, err4, err5, err6, err7))
 
@@ -206,6 +221,10 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 
 	if err9 != nil {
 		return err9
+	}
+
+	if err10 != nil {
+		return err10
 	}
 
 	s.validateRecord(r)
