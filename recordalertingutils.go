@@ -100,7 +100,7 @@ func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Reco
 func (s *Server) badBandcamp(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	file := false
 	for _, format := range r.GetRelease().GetFormats() {
-		if format.GetName() == "WAV" {
+		if format.GetName() == "File" {
 			file = true
 		}
 	}
