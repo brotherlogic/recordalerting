@@ -105,6 +105,11 @@ func (s *Server) badBandcamp(ctx context.Context, config *pb.Config, r *pbrc.Rec
 		}
 	}
 
+	// We can't assess if there are no formats yet.
+	if len(r.GetRelease().GetFormats()) == 0 {
+		file = true
+	}
+
 	return s.adjustState(ctx, config, r,
 		r.GetMetadata().GetGoalFolder() == 1782105 && !file,
 		pb.Problem_BAD_BANDCAMP, "bad bandcamp")
