@@ -223,10 +223,6 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 		return err9
 	}
 
-	if err10 != nil {
-		return err10
-	}
-
 	s.validateRecord(r)
 	s.alertForMissingSaleID(r)
 	s.alertForPurgatory(r)
