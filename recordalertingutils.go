@@ -180,7 +180,7 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	err7 := s.needsKeeperJudgement(ctx, config, r)
 	err8 := s.needsSaleBudget(ctx, config, r)
 	err9 := s.needsSold(ctx, config, r)
-	err10 := s.badBandcamp(ctx, config, r)
+	s.badBandcamp(ctx, config, r)
 
 	s.CtxLog(ctx, fmt.Sprintf("Run assess: %v, %v, %v, %v, %v, %v, %v", err1, err2, err3, err4, err5, err6, err7))
 
@@ -226,10 +226,6 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 
 	if err9 != nil {
 		return err9
-	}
-
-	if err10 != nil {
-		return err10
 	}
 
 	s.validateRecord(r)
