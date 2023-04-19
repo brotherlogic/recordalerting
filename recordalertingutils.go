@@ -140,7 +140,8 @@ func (s *Server) needsKeeperJudgement(ctx context.Context, config *pb.Config, r 
 
 func (s *Server) needsDigitalAssess(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_CD && r.GetRelease().GetFolderId() == 812802 && r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_IN_COLLECTION && r.GetRelease().GetRating() <= 4 && r.GetMetadata().GetDigitalAvailability() == pbrc.ReleaseMetadata_AVAILABILITY_UNKNOWN, pb.Problem_NEEDS_DIGITAL, "needs digital avail")
+		(r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_CD && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL) &&
+			r.GetRelease().GetFolderId() == 812802 && r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_IN_COLLECTION && r.GetRelease().GetRating() <= 4 && r.GetMetadata().GetDigitalAvailability() == pbrc.ReleaseMetadata_AVAILABILITY_UNKNOWN, pb.Problem_NEEDS_DIGITAL, "needs digital avail")
 }
 
 func (s *Server) needsFiled(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
