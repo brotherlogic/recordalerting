@@ -173,7 +173,8 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	}
 
 	err1 := s.needsFiled(ctx, config, r)
-	err2 := s.needsWeight(ctx, config, r)
+	//err2 := s.needsWeight(ctx, config, r)
+	var err2 error
 	err3 := s.needsWidth(ctx, config, r)
 	err4 := s.needsCondition(ctx, config, r)
 	err5 := s.needsSleeve(ctx, config, r)
