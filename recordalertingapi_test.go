@@ -145,7 +145,7 @@ func TestFilledRecordIntoCollectionButNoWeight(t *testing.T) {
 	})
 
 	_, err := s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: 1234})
-	if err != nil {
+	if err == nil {
 		t.Errorf("We expected this to be an error condition")
 	}
 
@@ -181,7 +181,7 @@ func TestFilledRecordIntoCollectionButNoDigitalKeep(t *testing.T) {
 	})
 
 	_, err := s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: 1234})
-	if err != nil {
+	if err == nil {
 		t.Errorf("We expected this to be an error condition")
 	}
 
