@@ -177,8 +177,10 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	err3 := s.needsWidth(ctx, config, r)
 	err4 := s.needsCondition(ctx, config, r)
 	err5 := s.needsSleeve(ctx, config, r)
-	err6 := s.needsDigitalAssess(ctx, config, r)
-	err7 := s.needsKeeperJudgement(ctx, config, r)
+	//err6 := s.needsDigitalAssess(ctx, config, r)
+	var err6 error
+	//err7 := s.needsKeeperJudgement(ctx, config, r)
+	var err7 error
 	err8 := s.needsSaleBudget(ctx, config, r)
 	err9 := s.needsSold(ctx, config, r)
 	s.badBandcamp(ctx, config, r)
