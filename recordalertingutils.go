@@ -36,7 +36,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 		}
 
 		issue, err := s.ImmediateIssue(ctx, fmt.Sprintf("%v [%v] %v", r.GetRelease().GetTitle(), r.GetRelease().GetInstanceId(), errorMessage), detail,
-			(class == pb.Problem_MISSING_FILED || class == pb.Problem_MISSING_WEIGHT), true)
+			(class == pb.Problem_NEEDS_KEEPER || class == pb.Problem_MISSING_FILED || class == pb.Problem_MISSING_WEIGHT), true)
 		if err != nil {
 			return err
 		}
