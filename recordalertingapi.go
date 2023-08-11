@@ -31,6 +31,11 @@ func (s *Server) ClientUpdate(ctx context.Context, req *rcpb.ClientUpdateRequest
 		return nil, err
 	}
 
+	// Don't validate records that need a gram pull
+	if r.GetMetadata().GetNeedsGramUpdate() {
+		return &rcpb.ClientUpdateResponse{}, nil
+	}
+
 	err = s.assessRecord(ctx, config, r)
 
 	errt := s.saveConfig(ctx, config)
