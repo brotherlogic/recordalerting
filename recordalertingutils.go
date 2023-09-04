@@ -190,7 +190,7 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	if r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNKNOWN {
 		if (r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_12_INCH || r.GetMetadata().GetFiledUnder() == pbrc.ReleaseMetadata_FILE_7_INCH) && r.GetMetadata().GetSaleState() != gd.SaleState_SOLD && r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_SOLD_ARCHIVE {
 			if time.Since(time.Unix(r.GetMetadata().GetLastCleanDate(), 0)) > time.Hour*24*365*3 {
-				if r.GetRelease().GetFolderId() != 3386035 && r.GetMetadata().GetMoveFolder() != 3386035 && r.GetMetadata().GetMoveFolder() != 6268933 {
+				if r.GetRelease().GetFolderId() != 3386035 && r.GetMetadata().GetMoveFolder() != 3386035 && r.GetMetadata().GetMoveFolder() != 6268933 && r.GetRelease().GetFolderId() != 6268933 {
 					err := s.rc.clean(ctx, r.GetRelease().GetInstanceId())
 					if err != nil {
 						return err
