@@ -100,6 +100,10 @@ func (rc *testRc) getSaleRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}, Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL}}}, nil
 }
 
+func (rc *testRc) update(ctx context.Context, i int32) {
+	//pass
+}
+
 func (rc *testRc) getLibraryRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	if rc.fail {
 		return []*pbrc.Record{}, fmt.Errorf("Built to fail")
