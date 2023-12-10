@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -39,6 +41,7 @@ func (s *Server) ClientUpdate(ctx context.Context, req *rcpb.ClientUpdateRequest
 	err = s.assessRecord(ctx, config, r)
 
 	if err != nil {
+		s.CtxLog(ctx, fmt.Sprintf("Updating because %v", err))
 		s.rc.update(ctx, req.GetInstanceId())
 	}
 
