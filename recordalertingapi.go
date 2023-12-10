@@ -8,7 +8,7 @@ import (
 	rcpb "github.com/brotherlogic/recordcollection/proto"
 )
 
-//ClientUpdate process new record
+// ClientUpdate process new record
 func (s *Server) ClientUpdate(ctx context.Context, req *rcpb.ClientUpdateRequest) (*rcpb.ClientUpdateResponse, error) {
 	config, err := s.loadConfig(ctx)
 	if err != nil {
@@ -37,6 +37,10 @@ func (s *Server) ClientUpdate(ctx context.Context, req *rcpb.ClientUpdateRequest
 	}
 
 	err = s.assessRecord(ctx, config, r)
+
+	if err != nil {
+		s.rc.update(ctx, req.GetInstanceId())
+	}
 
 	errt := s.saveConfig(ctx, config)
 	if errt != nil {

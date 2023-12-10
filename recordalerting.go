@@ -71,10 +71,22 @@ type rc interface {
 	clean(ctx context.Context, instanceID int32) error
 	getLibraryRecords(ctx context.Context) ([]*rcpb.Record, error)
 	getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error)
+	update(ctx context.Context, i int32)
 }
 
 type prodRC struct {
 	dial func(ctx context.Context, server string) (*grpc.ClientConn, error)
+}
+
+func (gh *prodRC) update(ctx context.Context, i int32) {
+	conn, err := gh.dial(ctx, "recordcollection")
+	if err != nil {
+		return
+	}
+	defer conn.Close()
+
+	client := rcpb.NewRecordCollectionServiceClient(conn)
+	client.UpdateRecord(ctx, &rcpb.UpdateRecordRequest{Reason: "Tripping gram update", Update: &rcpb.Record{Release: &gdpb.Release{InstanceId: i}, Metadata: &rcpb.ReleaseMetadata{NeedsGramUpdate: true}}})
 }
 
 func (gh *prodRC) getRecord(ctx context.Context, i int32) (*rcpb.Record, error) {
@@ -206,7 +218,7 @@ func (gh *prodRC) getRecordsInFolder(ctx context.Context, folder int32) ([]int32
 	return recs.GetInstanceIds(), nil
 }
 
-//Server main server type
+// Server main server type
 type Server struct {
 	*goserver.GoServer
 	rc             rc
