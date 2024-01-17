@@ -115,7 +115,7 @@ func (s *Server) badBandcamp(ctx context.Context, config *pb.Config, r *pbrc.Rec
 
 func (s *Server) needsSaleBudget(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_LISTED_TO_SELL && r.GetMetadata().GetSaleBudget() == "",
+		false,
 		pb.Problem_NEEDS_SALE_BUDGET, "needs sale budget")
 }
 
