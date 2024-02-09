@@ -159,6 +159,7 @@ func TestFilledRecordIntoCollectionButNoWeight(t *testing.T) {
 			MoveFolder:    242017,
 			Category:      pbrc.ReleaseMetadata_IN_COLLECTION,
 			WeightInGrams: 300,
+			RecordWidth:   10,
 			Keep:          pbrc.ReleaseMetadata_DIGITAL_KEEPER,
 			FiledUnder:    pbrc.ReleaseMetadata_FILE_12_INCH,
 		},
@@ -181,6 +182,7 @@ func TestFilledRecordIntoCollectionButNoDigitalKeep(t *testing.T) {
 			Category:      pbrc.ReleaseMetadata_IN_COLLECTION,
 			FiledUnder:    pbrc.ReleaseMetadata_FILE_12_INCH,
 			WeightInGrams: 300,
+			RecordWidth:   10,
 		},
 	})
 
@@ -195,6 +197,7 @@ func TestFilledRecordIntoCollectionButNoDigitalKeep(t *testing.T) {
 			MoveFolder:    242017,
 			Category:      pbrc.ReleaseMetadata_IN_COLLECTION,
 			WeightInGrams: 300,
+			RecordWidth:   10,
 			Keep:          pbrc.ReleaseMetadata_DIGITAL_KEEPER,
 			FiledUnder:    pbrc.ReleaseMetadata_FILE_12_INCH,
 		},
