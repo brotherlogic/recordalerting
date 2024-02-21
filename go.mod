@@ -4,9 +4,9 @@ go 1.18
 
 require (
 	github.com/brotherlogic/dstore v0.0.0-20240213113129-6ba7a68ec1dd
-	github.com/brotherlogic/godiscogs v0.0.0-20240116051314-7d3de02a07c4
+	github.com/brotherlogic/godiscogs v0.0.0-20240221154042-3003f558870c
 	github.com/brotherlogic/goserver v0.0.0-20240219201659-76015b978d96
-	github.com/brotherlogic/recordcollection v0.0.0-20240209005803-0bcffbcab67b
+	github.com/brotherlogic/recordcollection v0.0.0-20240221153235-faf4f6bcd1ad
 	github.com/brotherlogic/recordsorganiser v0.0.0-20240209041008-5e4482a050bd
 	github.com/golang/protobuf v1.5.3
 	github.com/prometheus/client_golang v1.18.0
