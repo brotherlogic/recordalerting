@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/brotherlogic/dstore v0.0.0-20240213113129-6ba7a68ec1dd
 	github.com/brotherlogic/godiscogs v0.0.0-20240221154042-3003f558870c
-	github.com/brotherlogic/goserver v0.0.0-20240222055603-99af0f9
+	github.com/brotherlogic/goserver v0.0.0-20240303201817-99af0f9eddf7
 	github.com/brotherlogic/recordcollection v0.0.0-20240227145100-5548d0d7e2f1
 	github.com/brotherlogic/recordsorganiser v0.0.0-20240209041008-5e4482a050bd
 	github.com/golang/protobuf v1.5.3
