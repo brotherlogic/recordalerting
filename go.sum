@@ -2385,6 +2385,8 @@ github.com/brotherlogic/githubcard v0.0.0-20240130025648-8b1c480afd85/go.mod h1:
 github.com/brotherlogic/githubcard v0.0.0-20240206002157-a50783191824/go.mod h1:KPr8ycuXGLTUKk7Pc9H1sQchV3p3XhTib4MjzjC3PwE=
 github.com/brotherlogic/githubcard v0.0.0-20240213021646-eb033c672608 h1:31au5tVUwshUleT9zrIh5cQYuMkUsK7ee0ybv+y6ark=
 github.com/brotherlogic/githubcard v0.0.0-20240213021646-eb033c672608/go.mod h1:2ECABOYPWAhygSkWlpe8tT4MXByYZ1jgarxxepdqpmg=
+github.com/brotherlogic/githubridge v0.2766.0 h1:hqsFndrY7oHeu0Fqrrd5Sf6vPw56QtmLgU92N5yOG8w=
+github.com/brotherlogic/githubridge v0.2766.0/go.mod h1:xLDniGWZR/CZZheZ2tNJ0OUQ8v5ex3/RF+zu2ACQK/o=
 github.com/brotherlogic/gobuildslave v0.0.0-20201112143137-ce3a2e75a18e/go.mod h1:gnbI1PHvnu1JX1Omx7okU5jSejp3kC6k1ha6SjjAW+E=
 github.com/brotherlogic/gobuildslave v0.0.0-20210517144112-4098e8e4a598/go.mod h1:fiYCjFtjZNogzRObwEGJ0Uev0pD/2tctSlW3mAgW1yE=
 github.com/brotherlogic/gobuildslave v0.0.0-20210602144845-3668b9c969f1/go.mod h1:0JppatVrSKZb799PaHbX8j9nJIwEziC0Gu8OnNLgggk=
@@ -2715,6 +2717,8 @@ github.com/brotherlogic/goserver v0.0.0-20230619155835-969c746dba11/go.mod h1:PX
 github.com/brotherlogic/goserver v0.0.0-20230726200050-779ae6811580/go.mod h1:PXiSCAIMpTFPvUu1TUUZXzPqpwoopeduP57Gohd1gxI=
 github.com/brotherlogic/goserver v0.0.0-20240222055603-0ccbf7d6dfeb h1:krm0MsMBmcm/Pu/bI1HMs7oos7ShDFYnYJZLlI7QlOM=
 github.com/brotherlogic/goserver v0.0.0-20240222055603-0ccbf7d6dfeb/go.mod h1:PXiSCAIMpTFPvUu1TUUZXzPqpwoopeduP57Gohd1gxI=
+github.com/brotherlogic/goserver v0.0.0-20240303201817-99af0f9eddf7 h1:lCKzK20PM51edCIiTQc3OdzKOfx1vVRzavfUS+opI6A=
+github.com/brotherlogic/goserver v0.0.0-20240303201817-99af0f9eddf7/go.mod h1:ZPGu+//9T5dxiOPcrK2LN0uqUG5Zmbw4DgZoRBLBSLo=
 github.com/brotherlogic/keymapper v0.0.0-20201116203852-f939ef86e1a2/go.mod h1:bZEHwfvamDSiweU+qiuNXmK5hUteKykayCtBVEOcq1U=
 github.com/brotherlogic/keymapper v0.0.0-20210311144023-8fb7e9401321/go.mod h1:cUAjkXcFmwSRCtsgbM/vmBu+rRexe1YOw5/PmGDwFw8=
 github.com/brotherlogic/keymapper v0.0.0-20210820140329-0a4c6cea65e8/go.mod h1:h1g13dewznZrv1+SHrh360wy+dK6iXS5042TiC8b4bY=
