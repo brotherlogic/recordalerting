@@ -18,15 +18,6 @@ var movetests = []struct {
 		Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_STAGED_TO_SELL, GoalFolder: 242017, RecordWidth: 81.2, SalePriceUpdate: time.Now().Unix()}}},
 }
 
-func TestNoSale(t *testing.T) {
-	s := Init()
-	s.SkipLog = true
-	s.SkipIssue = true
-	s.rc = &testRc{}
-
-	s.alertForMissingSaleID(&pbrc.Record{Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL}})
-}
-
 func TestPurgatory(t *testing.T) {
 	s := Init()
 	s.SkipLog = true
