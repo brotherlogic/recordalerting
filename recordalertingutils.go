@@ -235,7 +235,6 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	}
 
 	s.validateRecord(r)
-	s.alertForMissingSaleID(r)
 	s.alertForPurgatory(r)
 
 	return nil
@@ -260,13 +259,6 @@ func (s *Server) validateRecord(r *pbrc.Record) {
 	if r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_PURCHASED && time.Now().Sub(time.Unix(r.GetMetadata().GetLastUpdateTime(), 0)) > time.Hour*24 {
 		s.alertCount++
 		s.RaiseIssue(fmt.Sprintf("%v Stale Purchase", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v has staled", r.GetRelease().GetInstanceId()))
-	}
-}
-
-func (s *Server) alertForMissingSaleID(r *pbrc.Record) {
-	if r.GetMetadata().GetSaleId() <= 0 && r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_LISTED_TO_SELL {
-		s.alertCount++
-		s.RaiseIssue(fmt.Sprintf("%v is a problematic record sale id", r.GetRelease().GetInstanceId()), fmt.Sprintf("%v (%v) is missing the sale id", r.GetRelease().GetId(), r.GetRelease().GetInstanceId()))
 	}
 }
 
