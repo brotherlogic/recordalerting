@@ -92,7 +92,7 @@ func (s *Server) needsWeight(ctx context.Context, config *pb.Config, r *pbrc.Rec
 
 func (s *Server) staleLimbo(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetRelease().GetFolderId() == 3380098 && time.Since(time.Unix(r.GetMetadata().GetLastMoveTime(), 0)) > time.Hour*24*7,
+		r.GetRelease().GetFolderId() == 3380098 && time.Since(time.Unix(r.GetMetadata().GetLastMoveTime(), 0)) > time.Hour*24*7 && time.Since(time.Unix(r.Metadata.GetDateAdded(), 0)) > time.Hour*24*7,
 		pb.Problem_STALE_LIMBO, "stale limbo")
 }
 
