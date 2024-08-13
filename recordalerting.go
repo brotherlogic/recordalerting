@@ -68,7 +68,6 @@ func (gh *prodRO) getLocation(ctx context.Context, name string) (*pbro.Location,
 
 type rc interface {
 	getRecord(ctx context.Context, instanceID int32) (*rcpb.Record, error)
-	clean(ctx context.Context, instanceID int32) error
 	getLibraryRecords(ctx context.Context) ([]*rcpb.Record, error)
 	getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error)
 	update(ctx context.Context, i int32)
@@ -104,26 +103,6 @@ func (gh *prodRC) getRecord(ctx context.Context, i int32) (*rcpb.Record, error) 
 	}
 
 	return recs.GetRecord(), nil
-}
-
-func (gh *prodRC) clean(ctx context.Context, i int32) error {
-	conn, err := gh.dial(ctx, "recordcollection")
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	client := rcpb.NewRecordCollectionServiceClient(conn)
-	_, err = client.UpdateRecord(ctx, &rcpb.UpdateRecordRequest{Reason: "alert-clean", Update: &rcpb.Record{
-		Release:  &gdpb.Release{InstanceId: i},
-		Metadata: &rcpb.ReleaseMetadata{MoveFolder: 3386035},
-	}})
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (s *Server) loadConfig(ctx context.Context) (*pb.Config, error) {
