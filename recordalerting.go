@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
+	"time"
 
 	"github.com/brotherlogic/goserver"
 	"github.com/prometheus/client_golang/prometheus"
@@ -12,6 +14,8 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 
@@ -20,6 +24,7 @@ import (
 	dspb "github.com/brotherlogic/dstore/proto"
 	gdpb "github.com/brotherlogic/godiscogs/proto"
 	pbg "github.com/brotherlogic/goserver/proto"
+	pbgr "github.com/brotherlogic/gramophile/proto"
 	pb "github.com/brotherlogic/recordalerting/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"
 	pbro "github.com/brotherlogic/recordsorganiser/proto"
@@ -106,24 +111,51 @@ func (gh *prodRC) getRecord(ctx context.Context, i int32) (*rcpb.Record, error) 
 	return recs.GetRecord(), nil
 }
 
+func buildContext(ctx context.Context) (context.Context, context.CancelFunc, error) {
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	text, err := ioutil.ReadFile(fmt.Sprintf("%v/.gramophile", dirname))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	user := &pbgr.GramophileAuth{}
+	err = proto.UnmarshalText(string(text), user)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	mContext := metadata.AppendToOutgoingContext(ctx, "auth-token", user.GetToken())
+	ctx, cancel := context.WithTimeout(mContext, time.Minute)
+	return ctx, cancel, nil
+}
+
 func (gh *prodRC) clean(ctx context.Context, i int32) error {
-	conn, err := gh.dial(ctx, "recordcollection")
+	// Dial gram
+	conn, err := grpc.NewClient("gramophile-grpc.brotherlogic-backend.com:80", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
 
-	client := rcpb.NewRecordCollectionServiceClient(conn)
-	_, err = client.UpdateRecord(ctx, &rcpb.UpdateRecordRequest{Reason: "alert-clean", Update: &rcpb.Record{
-		Release:  &gdpb.Release{InstanceId: i},
-		Metadata: &rcpb.ReleaseMetadata{MoveFolder: 3386035},
-	}})
-
-	if err != nil {
-		return err
+	gclient := pbgr.NewGramophileEServiceClient(conn)
+	nctx, cancel, gerr := buildContext(ctx)
+	if gerr != nil {
+		return gerr
 	}
+	defer cancel()
 
-	return nil
+	_, err = gclient.SetIntent(nctx, &pbgr.SetIntentRequest{
+		InstanceId: int64(i),
+		Intent: &pbgr.Intent{
+			NewFolder: 3386035,
+		},
+	})
+
+	return err
 }
 
 func (s *Server) loadConfig(ctx context.Context) (*pb.Config, error) {
