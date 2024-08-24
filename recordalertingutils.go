@@ -97,7 +97,7 @@ func (s *Server) staleLimbo(ctx context.Context, config *pb.Config, r *pbrc.Reco
 
 func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		(r.GetMetadata().GetMoveFolder() == 812802 || (r.GetRelease().GetFolderId() == 812802 && r.GetMetadata().GetMoveFolder() != 0)) &&
+		(r.GetRelease().GetFolderId() == 812802 || r.GetRelease().GetFolderId() == 7651472) &&
 			r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL &&
 			r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN &&
 			r.GetMetadata().GetRecordWidth() <= 0 && r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_PURCHASED,
@@ -142,7 +142,7 @@ func (s *Server) needsSold(ctx context.Context, config *pb.Config, r *pbrc.Recor
 
 func (s *Server) needsKeeperJudgement(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		time.Since(time.Unix(r.GetMetadata().GetDateAdded(), 0)) > time.Hour*24 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && r.GetRelease().GetFolderId() == 812802 && r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_IN_COLLECTION && r.GetMetadata().GetKeep() == pbrc.ReleaseMetadata_KEEP_UNKNOWN, pb.Problem_NEEDS_KEEPER, "needs keeper judgement")
+		time.Since(time.Unix(r.GetMetadata().GetDateAdded(), 0)) > time.Hour*24 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && (r.GetRelease().GetFolderId() == 812802 || r.GetRelease().GetFolderId() == 7651472) && r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_IN_COLLECTION && r.GetMetadata().GetKeep() == pbrc.ReleaseMetadata_KEEP_UNKNOWN, pb.Problem_NEEDS_KEEPER, "needs keeper judgement")
 }
 
 func (s *Server) needsDigitalAssess(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
