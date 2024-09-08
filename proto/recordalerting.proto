@@ -22,6 +22,7 @@ message Problem {
         NEEDS_SOLD_DETAILS = 9;
         BAD_BANDCAMP = 10;
         STALE_LIMBO = 11;
+	EXPIRED_SALE = 12;
     }
     ProblemType type = 1;
     int32 instance_id = 2;

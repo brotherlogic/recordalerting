@@ -11,6 +11,7 @@ import (
 
 	pb "github.com/brotherlogic/recordalerting/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
+		pbgd "github.com/brotherlogic/godiscogs/proto"
 )
 
 func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Record, needs bool, class pb.Problem_ProblemType, errorMessage string) error {
@@ -104,6 +105,13 @@ func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Reco
 		pb.Problem_MISSING_WIDTH, "needs width")
 }
 
+func (s *Server) expiredSale(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	return s.adjustState(ctx, config, r,
+	       r.GetMetadata().GetSaleState() == pbgd.SaleState_EXPIRED,
+		pb.Problem_EXPIRED_SALE, "expired sale")
+}
+
+
 func (s *Server) badBandcamp(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	file := false
 	for _, format := range r.GetRelease().GetFormats() {
@@ -191,6 +199,7 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	//var err7 error
 	err8 := s.needsSaleBudget(ctx, config, r)
 	err9 := s.needsSold(ctx, config, r)
+	err10 := s.expiredSale(ctx, config, r)
 	s.staleLimbo(ctx, config, r)
 	s.badBandcamp(ctx, config, r)
 
@@ -224,6 +233,10 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 
 	if err9 != nil {
 		return err9
+	}
+
+	if err10 != nil {
+	return err10
 	}
 
 	s.validateRecord(r)
