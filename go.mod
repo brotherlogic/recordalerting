@@ -3,11 +3,11 @@ module github.com/brotherlogic/recordalerting
 go 1.23.2
 
 require (
-	github.com/brotherlogic/dstore v0.0.0-20250317170018-a7d641a8d0a7
+	github.com/brotherlogic/dstore v0.0.0-20250317173459-6a692f6ae605
 	github.com/brotherlogic/godiscogs v0.0.0-20250131163651-1e34c776a68e
 	github.com/brotherlogic/goserver v0.0.0-20250123145056-95c6fbb2310a
 	github.com/brotherlogic/recordcollection v0.0.0-20250227174213-ce20ec909d87
-	github.com/brotherlogic/recordsorganiser v0.0.0-20250317161701-0c06b359b40f
+	github.com/brotherlogic/recordsorganiser v0.0.0-20250317174523-1abea4cf4dd9
 	github.com/golang/protobuf v1.5.4
 	github.com/prometheus/client_golang v1.21.1
 	golang.org/x/net v0.37.0
@@ -17,15 +17,15 @@ require (
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/brotherlogic/buildserver v0.0.0-20250317162604-230e8a616101 // indirect
+	github.com/brotherlogic/buildserver v0.0.0-20250317172508-285a995577a7 // indirect
 	github.com/brotherlogic/datastore v0.0.0-20250313015544-917b63bdd6ff // indirect
 	github.com/brotherlogic/discovery v0.0.0-20241109204028-02908558af09 // indirect
-	github.com/brotherlogic/githubcard v0.0.0-20250317162051-9d009ec41b5a // indirect
+	github.com/brotherlogic/githubcard v0.0.0-20250317174826-1d04fbcc7960 // indirect
 	github.com/brotherlogic/githubridge v0.2849.0 // indirect
-	github.com/brotherlogic/gobuildslave v0.0.0-20250317163501-6ad09d3d5e3c // indirect
+	github.com/brotherlogic/gobuildslave v0.0.0-20250317174110-a05420317985 // indirect
 	github.com/brotherlogic/keystore v0.0.0-20240508161349-814b3200b126 // indirect
-	github.com/brotherlogic/lock v0.0.0-20250317164647-4741188cd71b // indirect
-	github.com/brotherlogic/logging v0.0.0-20250317165020-c06370eeb026 // indirect
+	github.com/brotherlogic/lock v0.0.0-20250317174609-9b4f83e36aa1 // indirect
+	github.com/brotherlogic/logging v0.0.0-20250317174108-4aa7b1b349cc // indirect
 	github.com/brotherlogic/monitor v0.0.0-20221025152653-c10877c5f9e6 // indirect
 	github.com/brotherlogic/versionserver v0.0.0-20221025154054-c9bcd41be2f2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
