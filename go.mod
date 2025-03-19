@@ -3,7 +3,7 @@ module github.com/brotherlogic/recordalerting
 go 1.23.2
 
 require (
-	github.com/brotherlogic/dstore v0.0.0-20250318224412-dac9090cb437
+	github.com/brotherlogic/dstore v0.0.0-20250319022638-cd895249c3e3
 	github.com/brotherlogic/godiscogs v0.0.0-20250131163651-1e34c776a68e
 	github.com/brotherlogic/goserver v0.0.0-20250123145056-95c6fbb2310a
 	github.com/brotherlogic/recordcollection v0.0.0-20250227174213-ce20ec909d87
@@ -22,7 +22,7 @@ require (
 	github.com/brotherlogic/discovery v0.0.0-20241109204028-02908558af09 // indirect
 	github.com/brotherlogic/githubcard v0.0.0-20250319021721-c1461935513b // indirect
 	github.com/brotherlogic/githubridge v0.2849.0 // indirect
-	github.com/brotherlogic/gobuildslave v0.0.0-20250319013528-f10cc3431006 // indirect
+	github.com/brotherlogic/gobuildslave v0.0.0-20250319022705-4147d8668b55 // indirect
 	github.com/brotherlogic/keystore v0.0.0-20240508161349-814b3200b126 // indirect
 	github.com/brotherlogic/lock v0.0.0-20250319013546-6a44791a6491 // indirect
 	github.com/brotherlogic/logging v0.0.0-20250319015001-c210e12ccf52 // indirect
