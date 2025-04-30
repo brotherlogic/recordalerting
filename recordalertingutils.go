@@ -9,10 +9,26 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	pbgh "github.com/brotherlogic/githubcard/proto"
 	pbgd "github.com/brotherlogic/godiscogs/proto"
 	pb "github.com/brotherlogic/recordalerting/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 )
+
+func (s *Server) IssueIsClosed(ctx context.Context, number int32) bool {
+	conn, err := s.FDialServer(ctx, "githubcard")
+	if err != nil {
+		return false
+	}
+	defer conn.Close()
+
+	client := pbgh.NewGithubClient(conn)
+	_, err = client.Get(ctx, &pbgh.Issue{Service: "recordalerting", Number: number})
+	if status.Code(err) == codes.NotFound {
+		return true
+	}
+	return false
+}
 
 func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Record, needs bool, class pb.Problem_ProblemType, errorMessage string) error {
 	// Does this record need a weight
@@ -25,6 +41,23 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 		}
 	}
 	s.CtxLog(ctx, fmt.Sprintf("Already seen %v -> %v", alreadySeen, number))
+
+	if alreadySeen {
+		if s.IssueIsClosed(ctx, number) {
+			var problems []*pb.Problem
+			for _, p := range config.GetProblems() {
+				if p.GetInstanceId() != r.GetRelease().GetInstanceId() || p.GetType() != class {
+					problems = append(problems, p)
+				}
+			}
+			config.Problems = problems
+			err := s.saveConfig(ctx, config)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	if needs && !alreadySeen {
 		detail := fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v\n", r.GetRelease().GetInstanceId(), r.GetRelease().GetId())
 		if class == pb.Problem_MISSING_FILED {
