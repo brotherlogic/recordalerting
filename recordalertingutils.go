@@ -24,6 +24,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 			number = problem.GetIssueNumber()
 		}
 	}
+	s.CtxLog(ctx, fmt.Sprintf("Already seen %v -> %v", alreadySeen, number))
 	if needs && !alreadySeen {
 		detail := fmt.Sprintf("This one [%v]: https://www.discogs.com/madeup/release/%v\n", r.GetRelease().GetInstanceId(), r.GetRelease().GetId())
 		if class == pb.Problem_MISSING_FILED {
