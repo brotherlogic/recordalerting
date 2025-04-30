@@ -23,8 +23,8 @@ func (s *Server) IssueIsClosed(ctx context.Context, number int32) bool {
 	defer conn.Close()
 
 	client := pbgh.NewGithubClient(conn)
-	_, err = client.Get(ctx, &pbgh.Issue{Service: "recordalerting", Number: number})
-	if status.Code(err) == codes.NotFound {
+	r, err := client.Get(ctx, &pbgh.Issue{Service: "recordalerting", Number: number})
+	if status.Code(err) == codes.NotFound || (r != nil && r.GetState() == pbgh.Issue_CLOSED) {
 		return true
 	}
 	return false
