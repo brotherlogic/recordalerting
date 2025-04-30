@@ -24,6 +24,7 @@ func (s *Server) IssueIsClosed(ctx context.Context, number int32) bool {
 
 	client := pbgh.NewGithubClient(conn)
 	r, err := client.Get(ctx, &pbgh.Issue{Service: "recordalerting", Number: number})
+	s.CtxLog(ctx, fmt.Sprintf("Issue %v and %v", r, err))
 	if status.Code(err) == codes.NotFound || (r != nil && r.GetState() == pbgh.Issue_CLOSED) {
 		return true
 	}
