@@ -122,7 +122,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 
 func (s *Server) needsWeight(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		(r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_STAGED_TO_SELL && r.GetRelease().GetFolderId() == 7651472 && r.GetMetadata().GetWeightInGrams() <= 5),
+		(r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_STAGED_TO_SELL && (r.GetRelease().GetFolderId() == 7651472 || r.GetRelease().GetFolderId() == 7665013) && r.GetMetadata().GetWeightInGrams() <= 5),
 		pb.Problem_MISSING_WEIGHT, "needs weight")
 }
 
@@ -134,7 +134,7 @@ func (s *Server) staleLimbo(ctx context.Context, config *pb.Config, r *pbrc.Reco
 
 func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		(r.GetRelease().GetFolderId() == 7665013 || r.GetRelease().GetFolderId() == 812802 || r.GetRelease().GetFolderId() == 7651472) &&
+		(r.GetRelease().GetFolderId() == 7665013 || r.GetRelease().GetFolderId() == 7664293 || r.GetRelease().GetFolderId() == 812802 || r.GetRelease().GetFolderId() == 7651472) &&
 			r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL &&
 			r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN &&
 			r.GetMetadata().GetRecordWidth() <= 0.5 && r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_PURCHASED,
