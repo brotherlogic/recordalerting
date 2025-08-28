@@ -268,6 +268,7 @@ func (s *Server) GetState() []*pbg.State {
 
 func main() {
 	var quiet = flag.Bool("quiet", false, "Show all output")
+	var clean = flag.Bool("clean", false, "Show all output")
 	flag.Parse()
 
 	//Turn off logging
@@ -278,6 +279,21 @@ func main() {
 	server := Init()
 	server.PrepServer("recordalerting")
 	server.Register = server
+
+	if *clean {
+		ctx := context.Background()
+		config, err := server.loadConfig(ctx)
+		if err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+		config.Problems = make([]*pb.Problem, 0)
+		err = server.saveConfig(ctx, config)
+		if err != nil {
+			log.Fatalf("Error on save: %v", err)
+		}
+		fmt.Printf("Cleaned\n")
+		return
+	}
 
 	err := server.RegisterServerV2(false)
 	if err != nil {
