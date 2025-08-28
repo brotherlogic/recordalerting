@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"time"
 
 	"github.com/brotherlogic/goserver"
 	"github.com/prometheus/client_golang/prometheus"
@@ -20,6 +21,7 @@ import (
 	dspb "github.com/brotherlogic/dstore/proto"
 	gdpb "github.com/brotherlogic/godiscogs/proto"
 	pbg "github.com/brotherlogic/goserver/proto"
+	"github.com/brotherlogic/goserver/utils"
 	pb "github.com/brotherlogic/recordalerting/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"
 	pbro "github.com/brotherlogic/recordsorganiser/proto"
@@ -268,6 +270,7 @@ func (s *Server) GetState() []*pbg.State {
 
 func main() {
 	var quiet = flag.Bool("quiet", false, "Show all output")
+	var clean = flag.Bool("clean", false, "Show all output")
 	flag.Parse()
 
 	//Turn off logging
@@ -278,6 +281,24 @@ func main() {
 	server := Init()
 	server.PrepServer("recordalerting")
 	server.Register = server
+
+	if *clean {
+		ctx, cancel := utils.ManualContext("alerting_clean", time.Minute*30)
+	defer cancel()
+		config, err := server.loadConfig(ctx)
+		if err != nil {
+			fmt.Printf("Bad: %v", err)
+			return
+		}
+		config.Problems = make([]*pb.Problem, 0)
+		err = server.saveConfig(ctx, config)
+		if err != nil {
+			fmt.Printf("Worse: %v", err)
+			return
+		}
+		fmt.Printf("Cleaned\n")
+		return
+	}
 
 	err := server.RegisterServerV2(false)
 	if err != nil {
