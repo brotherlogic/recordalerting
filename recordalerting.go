@@ -284,12 +284,14 @@ func main() {
 		ctx := context.Background()
 		config, err := server.loadConfig(ctx)
 		if err != nil {
-			log.Fatalf("Error: %v", err)
+			fmt.Printf("Bad: %v", err)
+			return
 		}
 		config.Problems = make([]*pb.Problem, 0)
 		err = server.saveConfig(ctx, config)
 		if err != nil {
-			log.Fatalf("Error on save: %v", err)
+			fmt.Printf("Worse: %v", err)
+			return
 		}
 		fmt.Printf("Cleaned\n")
 		return
