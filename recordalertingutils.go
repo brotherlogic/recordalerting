@@ -277,6 +277,10 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	s.validateRecord(r)
 	s.alertForPurgatory(r)
 
+	// If the record has no arrived date, we trigger a gram update
+	if r.GetMetadata().GetDateArrived() == 0 {
+		return fmt.Errorf("please rebuild because we haven't arrived this reocrd yet")
+	}
 	return nil
 }
 
