@@ -146,6 +146,7 @@ func TestFilledDigitalIntoCollectionButNoDigitalKeep(t *testing.T) {
 			FiledUnder:    pbrc.ReleaseMetadata_FILE_DIGITAL,
 			WeightInGrams: 300,
 			DateArrived:   12,
+			Notes:         "Some notes",
 		},
 	})
 
