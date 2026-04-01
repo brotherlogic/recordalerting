@@ -114,7 +114,8 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 			class == pb.Problem_NEEDS_KEEPER ||
 			class == pb.Problem_NEEDS_SOLD_DETAILS ||
 			class == pb.Problem_BAD_BANDCAMP ||
-			class == pb.Problem_MISSING_SLEEVE) {
+			class == pb.Problem_MISSING_SLEEVE ||
+			class == pb.Problem_MISSING_NOTES) {
 		return status.Errorf(codes.FailedPrecondition, "Record %v fails validation - please fix (%v)", r.GetRelease().GetInstanceId(), class)
 	}
 	return nil
@@ -139,6 +140,12 @@ func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Reco
 			r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_UNKNOWN &&
 			r.GetMetadata().GetRecordWidth() <= 0.5 && r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_PURCHASED,
 		pb.Problem_MISSING_WIDTH, "needs width")
+}
+
+func (s *Server) needsNotes(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	return s.adjustState(ctx, config, r,
+		r.GetMetadata().GetNotes() == "",
+		pb.Problem_MISSING_NOTES, "needs notes")
 }
 
 func (s *Server) expiredSale(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
@@ -235,6 +242,7 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	err8 := s.needsSaleBudget(ctx, config, r)
 	err9 := s.needsSold(ctx, config, r)
 	err10 := s.expiredSale(ctx, config, r)
+	err11 := s.needsNotes(ctx, config, r)
 	s.staleLimbo(ctx, config, r)
 	s.badBandcamp(ctx, config, r)
 
@@ -272,6 +280,10 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 
 	if err10 != nil {
 		return err10
+	}
+
+	if err11 != nil {
+		return err11
 	}
 
 	s.validateRecord(r)
