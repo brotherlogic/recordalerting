@@ -144,7 +144,7 @@ func (s *Server) needsWidth(ctx context.Context, config *pb.Config, r *pbrc.Reco
 
 func (s *Server) needsNotes(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetNotes() == "",
+		(r.GetRelease().GetFolderId() == 7651472 || r.GetRelease().GetFolderId() == 7665013 || r.GetRelease().GetFolderId() == 7664293) && r.GetMetadata().GetNotes() == "",
 		pb.Problem_MISSING_NOTES, "needs notes")
 }
 
