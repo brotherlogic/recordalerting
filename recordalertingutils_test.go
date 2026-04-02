@@ -52,3 +52,36 @@ func InitTest() (*Server, *testRc) {
 
 	return s, trc
 }
+func TestNeedsNotes(t *testing.T) {
+	s, _ := InitTest()
+
+	// Record in allowed folder with no notes -> should fail (return error)
+	r1 := &pbrc.Record{
+		Release: &pbgd.Release{FolderId: 7651472},
+		Metadata: &pbrc.ReleaseMetadata{Notes: ""},
+	}
+	err1 := s.needsNotes(context.Background(), &pb.Config{}, r1)
+	if err1 == nil {
+		t.Errorf("Should have failed for missing notes in folder 7651472")
+	}
+
+	// Record in disallowed folder with no notes -> should pass (return nil)
+	r2 := &pbrc.Record{
+		Release: &pbgd.Release{FolderId: 1234},
+		Metadata: &pbrc.ReleaseMetadata{Notes: ""},
+	}
+	err2 := s.needsNotes(context.Background(), &pb.Config{}, r2)
+	if err2 != nil {
+		t.Errorf("Should have passed for missing notes in folder 1234: %v", err2)
+	}
+
+	// Record in allowed folder with notes -> should pass (return nil)
+	r3 := &pbrc.Record{
+		Release: &pbgd.Release{FolderId: 7651472},
+		Metadata: &pbrc.ReleaseMetadata{Notes: "Some notes"},
+	}
+	err3 := s.needsNotes(context.Background(), &pb.Config{}, r3)
+	if err3 != nil {
+		t.Errorf("Should have passed with notes in folder 7651472: %v", err3)
+	}
+}
