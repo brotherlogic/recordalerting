@@ -54,17 +54,17 @@ func InitTest() (*Server, *testRc) {
 }
 func TestNeedsNotes(t *testing.T) {
 	s, _ := InitTest()
-
-	// Record in allowed folder with no notes -> should fail (return error)
+ 
+	// Record in allowed folder with no notes and 0 rating -> should pass (return nil)
 	r1 := &pbrc.Record{
-		Release: &pbgd.Release{FolderId: 7651472},
+		Release: &pbgd.Release{FolderId: 7651472, Rating: 0},
 		Metadata: &pbrc.ReleaseMetadata{Notes: ""},
 	}
 	err1 := s.needsNotes(context.Background(), &pb.Config{}, r1)
-	if err1 == nil {
-		t.Errorf("Should have failed for missing notes in folder 7651472")
+	if err1 != nil {
+		t.Errorf("Should have passed for missing notes in folder 7651472 with 0 rating: %v", err1)
 	}
-
+ 
 	// Record in disallowed folder with no notes -> should pass (return nil)
 	r2 := &pbrc.Record{
 		Release: &pbgd.Release{FolderId: 1234},
@@ -74,7 +74,7 @@ func TestNeedsNotes(t *testing.T) {
 	if err2 != nil {
 		t.Errorf("Should have passed for missing notes in folder 1234: %v", err2)
 	}
-
+ 
 	// Record in allowed folder with notes -> should pass (return nil)
 	r3 := &pbrc.Record{
 		Release: &pbgd.Release{FolderId: 7651472},
@@ -83,5 +83,15 @@ func TestNeedsNotes(t *testing.T) {
 	err3 := s.needsNotes(context.Background(), &pb.Config{}, r3)
 	if err3 != nil {
 		t.Errorf("Should have passed with notes in folder 7651472: %v", err3)
+	}
+
+	// Record in allowed folder with no notes and > 0 rating -> should fail (return error)
+	r4 := &pbrc.Record{
+		Release: &pbgd.Release{FolderId: 7651472, Rating: 1},
+		Metadata: &pbrc.ReleaseMetadata{Notes: ""},
+	}
+	err4 := s.needsNotes(context.Background(), &pb.Config{}, r4)
+	if err4 == nil {
+		t.Errorf("Should have failed for missing notes in folder 7651472 with > 0 rating")
 	}
 }
