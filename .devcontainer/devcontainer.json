@@ -27,18 +27,17 @@
 	"containerEnv": {
 		"GH_GIT_PROTOCOL": "ssh"
 	},
-	"remoteOTEL.enabled": true,
 	"forwardPorts": [],
 	"runArgs": [
 		"--security-opt",
-		"label=disable",
+		"label=disable"
 	],
 	"mounts": [
 		{
 			"source": "${localEnv:HOME}/.ssh",
 			"target": "/home/vscode/.ssh", // Adjust "vscode" to your container's non-root user (e.g., "node", "user")
-			"type": "bind",
-			"options": "readonly" // Optional: makes keys read-only in container
+			"type": "bind"
 		}
-	]
+	],
+	"workspaceFolder": "/workspaces/recordalerting"
 }
