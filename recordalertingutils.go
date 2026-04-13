@@ -150,7 +150,7 @@ func (s *Server) needsNotes(ctx context.Context, config *pb.Config, r *pbrc.Reco
 
 func (s *Server) expiredSale(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		r.GetMetadata().GetSaleState() == pbgd.SaleState_EXPIRED && r.GetMetadata().GetSaleId() > 0,
+		r.GetMetadata().GetSaleState() == pbgd.SaleState_EXPIRED && r.GetMetadata().GetSaleId() > 0 && r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_STAGED_TO_SELL,
 		pb.Problem_EXPIRED_SALE, "expired sale")
 }
 
