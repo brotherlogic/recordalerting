@@ -43,19 +43,19 @@ type testRc struct {
 	order   bool
 	missing bool
 	failAll bool
-	iidMap  map[int32]*pbrc.Record
+	iidMap  map[int64]*pbrc.Record
 }
 
-func (rc *testRc) addRecord(iid int32, r *pbrc.Record) {
+func (rc *testRc) addRecord(iid int64, r *pbrc.Record) {
 	r.GetRelease().InstanceId = iid
 	rc.iidMap[iid] = r
 }
 
-func (rc *testRc) clean(ctx context.Context, instanceID int32) error {
+func (rc *testRc) clean(ctx context.Context, instanceID int64) error {
 	return nil
 }
 
-func (rc *testRc) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
+func (rc *testRc) getRecord(ctx context.Context, instanceID int64) (*pbrc.Record, error) {
 	if val, ok := rc.iidMap[instanceID]; ok {
 		return val, nil
 	}
@@ -79,11 +79,11 @@ func (rc *testRc) getRecordsInPurgatory(ctx context.Context) ([]*pbrc.Record, er
 	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}, Metadata: &pbrc.ReleaseMetadata{}}}, nil
 }
 
-func (rc *testRc) getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error) {
+func (rc *testRc) getRecordsInFolder(ctx context.Context, folder int32) ([]int64, error) {
 	if rc.fail {
-		return []int32{}, fmt.Errorf("Built to fail")
+		return []int64{}, fmt.Errorf("Built to fail")
 	}
-	return []int32{1234, 1233}, nil
+	return []int64{1234, 1233}, nil
 }
 
 func (rc *testRc) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
@@ -100,7 +100,7 @@ func (rc *testRc) getSaleRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}, Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL}}}, nil
 }
 
-func (rc *testRc) update(ctx context.Context, i int32) {
+func (rc *testRc) update(ctx context.Context, i int64) {
 	//pass
 }
 

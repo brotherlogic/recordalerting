@@ -1,24 +1,24 @@
 module github.com/brotherlogic/recordalerting
 
-go 1.25.0
+go 1.26.2
 
 require (
 	github.com/brotherlogic/dstore v0.0.0-20260203215131-c1953f4290fb
 	github.com/brotherlogic/githubcard v0.0.0-20260319022318-581af2e0f713
-	github.com/brotherlogic/godiscogs v0.0.0-20260330235557-f7073496fb1b
+	github.com/brotherlogic/godiscogs v0.0.0-20260522232013-a766a3d66aa2
 	github.com/brotherlogic/goserver v0.0.0-20260125051706-82df7bec125f
-	github.com/brotherlogic/recordcollection v0.0.0-20260401210610-f63f99abc027
-	github.com/brotherlogic/recordsorganiser v0.0.0-20260319022350-1f9b8b1f5539
+	github.com/brotherlogic/recordcollection v0.0.0-20260523191706-989f130f7584
+	github.com/brotherlogic/recordsorganiser v0.0.0-20260523220828-474e98038b45
 	github.com/golang/protobuf v1.5.4
 	github.com/prometheus/client_golang v1.23.2
-	golang.org/x/net v0.52.0
-	google.golang.org/grpc v1.80.0
+	golang.org/x/net v0.55.0
+	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
 )
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/brotherlogic/buildserver v0.0.0-20260319024819-9a8adf20e8bb // indirect
+	github.com/brotherlogic/buildserver v0.0.0-20260523025133-78f11a8fa0a1 // indirect
 	github.com/brotherlogic/datastore v0.0.0-20250610012354-722a6beaa331 // indirect
 	github.com/brotherlogic/discovery v0.0.0-20260319021723-0af9069c77b1 // indirect
 	github.com/brotherlogic/githubridge v0.2875.0 // indirect
@@ -36,7 +36,7 @@ require (
 	github.com/prometheus/procfs v0.20.1 // indirect
 	github.com/struCoder/pidusage v0.2.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
-	golang.org/x/sys v0.42.0 // indirect
-	golang.org/x/text v0.35.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260401024825-9d38bb4040a9 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260523011958-0a33c5d7ca68 // indirect
 )

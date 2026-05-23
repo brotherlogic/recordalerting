@@ -69,18 +69,18 @@ func (gh *prodRO) getLocation(ctx context.Context, name string) (*pbro.Location,
 }
 
 type rc interface {
-	getRecord(ctx context.Context, instanceID int32) (*rcpb.Record, error)
-	clean(ctx context.Context, instanceID int32) error
+	getRecord(ctx context.Context, instanceID int64) (*rcpb.Record, error)
+	clean(ctx context.Context, instanceID int64) error
 	getLibraryRecords(ctx context.Context) ([]*rcpb.Record, error)
-	getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error)
-	update(ctx context.Context, i int32)
+	getRecordsInFolder(ctx context.Context, folder int32) ([]int64, error)
+	update(ctx context.Context, i int64)
 }
 
 type prodRC struct {
 	dial func(ctx context.Context, server string) (*grpc.ClientConn, error)
 }
 
-func (gh *prodRC) update(ctx context.Context, i int32) {
+func (gh *prodRC) update(ctx context.Context, i int64) {
 	conn, err := gh.dial(ctx, "recordcollection")
 	if err != nil {
 		return
@@ -91,7 +91,7 @@ func (gh *prodRC) update(ctx context.Context, i int32) {
 	client.UpdateRecord(ctx, &rcpb.UpdateRecordRequest{Reason: "Tripping gram update", Update: &rcpb.Record{Release: &gdpb.Release{InstanceId: i}, Metadata: &rcpb.ReleaseMetadata{NeedsGramUpdate: true}}})
 }
 
-func (gh *prodRC) getRecord(ctx context.Context, i int32) (*rcpb.Record, error) {
+func (gh *prodRC) getRecord(ctx context.Context, i int64) (*rcpb.Record, error) {
 	conn, err := gh.dial(ctx, "recordcollection")
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func (gh *prodRC) getRecord(ctx context.Context, i int32) (*rcpb.Record, error) 
 	return recs.GetRecord(), nil
 }
 
-func (gh *prodRC) clean(ctx context.Context, i int32) error {
+func (gh *prodRC) clean(ctx context.Context, i int64) error {
 	conn, err := gh.dial(ctx, "recordcollection")
 	if err != nil {
 		return err
@@ -203,10 +203,10 @@ func (gh *prodRC) getLibraryRecords(ctx context.Context) ([]*rcpb.Record, error)
 	return recs, nil
 }
 
-func (gh *prodRC) getRecordsInFolder(ctx context.Context, folder int32) ([]int32, error) {
+func (gh *prodRC) getRecordsInFolder(ctx context.Context, folder int32) ([]int64, error) {
 	conn, err := gh.dial(ctx, "recordcollection")
 	if err != nil {
-		return []int32{}, err
+		return []int64{}, err
 	}
 	defer conn.Close()
 
@@ -214,7 +214,7 @@ func (gh *prodRC) getRecordsInFolder(ctx context.Context, folder int32) ([]int32
 	recs, err := client.QueryRecords(ctx, &rcpb.QueryRecordsRequest{Query: &rcpb.QueryRecordsRequest_FolderId{folder}})
 
 	if err != nil {
-		return []int32{}, err
+		return []int64{}, err
 	}
 
 	return recs.GetInstanceIds(), nil
