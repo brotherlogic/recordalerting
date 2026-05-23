@@ -36,6 +36,7 @@ const (
 	Problem_BAD_BANDCAMP       Problem_ProblemType = 10
 	Problem_STALE_LIMBO        Problem_ProblemType = 11
 	Problem_EXPIRED_SALE       Problem_ProblemType = 12
+	Problem_MISSING_NOTES      Problem_ProblemType = 13
 )
 
 // Enum value maps for Problem_ProblemType.
@@ -54,6 +55,7 @@ var (
 		10: "BAD_BANDCAMP",
 		11: "STALE_LIMBO",
 		12: "EXPIRED_SALE",
+		13: "MISSING_NOTES",
 	}
 	Problem_ProblemType_value = map[string]int32{
 		"UNKNOWN":            0,
@@ -69,6 +71,7 @@ var (
 		"BAD_BANDCAMP":       10,
 		"STALE_LIMBO":        11,
 		"EXPIRED_SALE":       12,
+		"MISSING_NOTES":      13,
 	}
 )
 
