@@ -41,7 +41,7 @@ func InitTest() (*Server, *testRc) {
 	s := Init()
 	s.SkipLog = true
 	s.SkipIssue = true
-	trc := &testRc{iidMap: make(map[int32]*pbrc.Record)}
+	trc := &testRc{iidMap: make(map[int64]*pbrc.Record)}
 	s.rc = trc
 	s.ro = &testRo{}
 

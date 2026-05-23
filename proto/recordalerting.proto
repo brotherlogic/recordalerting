@@ -25,7 +25,7 @@ message Problem {
 	EXPIRED_SALE = 12;
     }
     ProblemType type = 1;
-    int32 instance_id = 2;
+    int64 instance_id = 2;
     int32 issue_number = 3;
     int64 issue_opened_timestamp = 4;
 }
