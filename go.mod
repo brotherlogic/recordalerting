@@ -1,6 +1,6 @@
 module github.com/brotherlogic/recordalerting
 
-go 1.26.1
+go 1.26.2
 
 require (
 	github.com/brotherlogic/dstore v0.0.0-20260203215131-c1953f4290fb
