@@ -24,6 +24,7 @@ message Problem {
         STALE_LIMBO = 11;
 	EXPIRED_SALE = 12;
         MISSING_NOTES = 13;
+        MISSING_PACKAGE_SCORE = 14;
     }
     ProblemType type = 1;
     int64 instance_id = 2;
