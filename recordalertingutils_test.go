@@ -95,3 +95,20 @@ func TestNeedsNotes(t *testing.T) {
 		t.Errorf("Should have failed for missing notes in folder 7651472 with > 0 rating")
 	}
 }
+
+func TestMissingPackageScoreEnum(t *testing.T) {
+	if int32(pb.Problem_MISSING_PACKAGE_SCORE) != 14 {
+		t.Errorf("Expected Problem_MISSING_PACKAGE_SCORE to be 14, got %d", pb.Problem_MISSING_PACKAGE_SCORE)
+	}
+	if name, ok := pb.Problem_ProblemType_name[14]; !ok || name != "MISSING_PACKAGE_SCORE" {
+		t.Errorf("Expected ProblemType name for 14 to be MISSING_PACKAGE_SCORE, got %q", name)
+	}
+
+	metadata := &pbrc.ReleaseMetadata{
+		PackageScore: 78,
+	}
+	if metadata.GetPackageScore() != 78 {
+		t.Errorf("Expected GetPackageScore to return 78, got %d", metadata.GetPackageScore())
+	}
+}
+
