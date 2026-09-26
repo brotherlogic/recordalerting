@@ -16,6 +16,9 @@ import (
 )
 
 func (s *Server) IssueIsClosed(ctx context.Context, number int32) bool {
+	if s.SkipIssue {
+		return false
+	}
 	conn, err := s.FDialServer(ctx, "githubcard")
 	if err != nil {
 		return false
@@ -115,7 +118,8 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 			class == pb.Problem_NEEDS_SOLD_DETAILS ||
 			class == pb.Problem_BAD_BANDCAMP ||
 			class == pb.Problem_MISSING_SLEEVE ||
-			class == pb.Problem_MISSING_NOTES) {
+			class == pb.Problem_MISSING_NOTES ||
+			class == pb.Problem_MISSING_PACKAGE_SCORE) {
 		return status.Errorf(codes.FailedPrecondition, "Record %v fails validation - please fix (%v)", r.GetRelease().GetInstanceId(), class)
 	}
 	return nil
@@ -243,6 +247,7 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 	err9 := s.needsSold(ctx, config, r)
 	err10 := s.expiredSale(ctx, config, r)
 	err11 := s.needsNotes(ctx, config, r)
+	err12 := s.needsPackageScore(ctx, config, r)
 	s.staleLimbo(ctx, config, r)
 	s.badBandcamp(ctx, config, r)
 
@@ -286,6 +291,10 @@ func (s *Server) assessRecord(ctx context.Context, config *pb.Config, r *pbrc.Re
 		return err11
 	}
 
+	if err12 != nil {
+		return err12
+	}
+
 	s.validateRecord(r)
 	s.alertForPurgatory(r)
 
@@ -323,4 +332,27 @@ func (s *Server) alertForPurgatory(r *pbrc.Record) {
 		s.alertCount++
 		s.RaiseIssue(fmt.Sprintf("%v is a problematic record - purg", r.GetRelease().GetInstanceId()), fmt.Sprintf("[%v]. %v is in Purgatory!", r.GetRelease().GetId(), r.GetRelease().GetTitle()))
 	}
+}
+
+func isListeningPile(folderId int32) bool {
+	return folderId == 812802 || folderId == 7665013 || folderId == 7664293 || folderId == 7651472
+}
+
+func (s *Server) needsPackageScore(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
+	file := false
+	for _, format := range r.GetRelease().GetFormats() {
+		if format.GetName() == "File" {
+			file = true
+			break
+		}
+	}
+
+	qualified := isListeningPile(r.GetRelease().GetFolderId()) &&
+		r.GetRelease().GetRating() > 1 &&
+		r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL &&
+		!file
+
+	needs := qualified && r.GetMetadata().GetPackageScore() < 0
+
+	return s.adjustState(ctx, config, r, needs, pb.Problem_MISSING_PACKAGE_SCORE, "needs package score")
 }
