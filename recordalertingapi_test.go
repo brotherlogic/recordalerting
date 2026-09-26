@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"golang.org/x/net/context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	pbgd "github.com/brotherlogic/godiscogs/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
@@ -155,3 +157,76 @@ func TestFilledDigitalIntoCollectionButNoDigitalKeep(t *testing.T) {
 		t.Errorf("This should be fine but returned an error: %v", err)
 	}
 }
+
+func TestClientUpdate_PackageScoreValidationEnforced(t *testing.T) {
+	s, rc := InitTest()
+
+	// Record in listening pile with Rating > 1 and unset package score (-1)
+	rc.addRecord(12345, &pbrc.Record{
+		Release: &pbgd.Release{
+			InstanceId:      12345,
+			FolderId:        812802,
+			Rating:          4,
+			Title:           "Listening Album",
+			RecordCondition: "Near Mint",
+		},
+		Metadata: &pbrc.ReleaseMetadata{
+			DateArrived:         12,
+			Category:            pbrc.ReleaseMetadata_IN_COLLECTION,
+			MoveFolder:          242017,
+			GoalFolder:          242017,
+			FiledUnder:          pbrc.ReleaseMetadata_FILE_12_INCH,
+			WeightInGrams:       300,
+			RecordWidth:         1.0,
+			Keep:                pbrc.ReleaseMetadata_KEEPER,
+			DigitalAvailability: pbrc.ReleaseMetadata_DIGITAL_AVAILABLE,
+			PackageScore:        -1,
+			Notes:               "Some notes",
+		},
+	})
+
+	_, err := s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: 12345})
+	if err == nil {
+		t.Fatalf("Expected ClientUpdate to return error for unset package score, got nil")
+	}
+	if status.Code(err) != codes.FailedPrecondition {
+		t.Errorf("Expected status code FailedPrecondition, got %v (err: %v)", status.Code(err), err)
+	}
+}
+
+func TestClientUpdate_PackageScoreValidationPasses(t *testing.T) {
+	s, rc := InitTest()
+
+	// Record in listening pile with Rating > 1 and valid package score (>= 0)
+	rc.addRecord(12346, &pbrc.Record{
+		Release: &pbgd.Release{
+			InstanceId:      12346,
+			FolderId:        812802,
+			Rating:          4,
+			Title:           "Listening Album Valid Score",
+			RecordCondition: "Near Mint",
+		},
+		Metadata: &pbrc.ReleaseMetadata{
+			DateArrived:         12,
+			Category:            pbrc.ReleaseMetadata_IN_COLLECTION,
+			MoveFolder:          242017,
+			GoalFolder:          242017,
+			FiledUnder:          pbrc.ReleaseMetadata_FILE_12_INCH,
+			WeightInGrams:       300,
+			RecordWidth:         1.0,
+			Keep:                pbrc.ReleaseMetadata_KEEPER,
+			DigitalAvailability: pbrc.ReleaseMetadata_DIGITAL_AVAILABLE,
+			PackageScore:        3,
+			Notes:               "Some notes",
+		},
+	})
+
+	resp, err := s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: 12346})
+	if err != nil {
+		t.Fatalf("Expected ClientUpdate to succeed with valid package score, got error: %v", err)
+	}
+	if resp == nil {
+		t.Errorf("Expected non-nil ClientUpdateResponse")
+	}
+}
+
