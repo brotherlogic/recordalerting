@@ -365,3 +365,63 @@ func TestNeedsPackageScore_ResolutionCleansUpProblem(t *testing.T) {
 	}
 }
 
+func TestNeedsKeeperJudgement_NoLongerRequired(t *testing.T) {
+	s, _ := InitTest()
+	config := &pb.Config{}
+
+	r := &pbrc.Record{
+		Release: &pbgd.Release{
+			InstanceId: 7001,
+			FolderId:   812802,
+			Rating:     4,
+			Title:      "Keeper Test Album",
+		},
+		Metadata: &pbrc.ReleaseMetadata{
+			Category:   pbrc.ReleaseMetadata_IN_COLLECTION,
+			FiledUnder: pbrc.ReleaseMetadata_FILE_12_INCH,
+			Keep:       pbrc.ReleaseMetadata_KEEP_UNKNOWN,
+			DateAdded:  time.Now().Add(-time.Hour * 48).Unix(),
+		},
+	}
+
+	err := s.needsKeeperJudgement(context.Background(), config, r)
+	if err != nil {
+		t.Errorf("Expected nil error for unknown keep since keeper judgement is no longer required, got %v", err)
+	}
+}
+
+func TestNeedsKeeperJudgement_CleansUpExistingProblem(t *testing.T) {
+	s, _ := InitTest()
+	config := &pb.Config{
+		Problems: []*pb.Problem{
+			{
+				Type:        pb.Problem_NEEDS_KEEPER,
+				InstanceId:  7002,
+				IssueNumber: 999,
+			},
+		},
+	}
+
+	r := &pbrc.Record{
+		Release: &pbgd.Release{
+			InstanceId: 7002,
+			FolderId:   812802,
+		},
+		Metadata: &pbrc.ReleaseMetadata{
+			Keep: pbrc.ReleaseMetadata_KEEP_UNKNOWN,
+		},
+	}
+
+	err := s.needsKeeperJudgement(context.Background(), config, r)
+	if err != nil {
+		t.Fatalf("Expected nil error when evaluating keeper judgement, got %v", err)
+	}
+
+	for _, p := range config.GetProblems() {
+		if p.GetType() == pb.Problem_NEEDS_KEEPER && p.GetInstanceId() == 7002 {
+			t.Errorf("Expected NEEDS_KEEPER problem to be removed from config.Problems, but it still exists")
+		}
+	}
+}
+
+

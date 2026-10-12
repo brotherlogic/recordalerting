@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
@@ -229,4 +230,42 @@ func TestClientUpdate_PackageScoreValidationPasses(t *testing.T) {
 		t.Errorf("Expected non-nil ClientUpdateResponse")
 	}
 }
+
+func TestClientUpdate_NoKeeperRequired(t *testing.T) {
+	s, rc := InitTest()
+
+	// Record in listening pile with Rating > 1, Keep is unknown, but valid package score (>= 0)
+	rc.addRecord(12347, &pbrc.Record{
+		Release: &pbgd.Release{
+			InstanceId:      12347,
+			FolderId:        812802,
+			Rating:          4,
+			Title:           "Listening Album No Keeper",
+			RecordCondition: "Near Mint",
+		},
+		Metadata: &pbrc.ReleaseMetadata{
+			DateArrived:         12,
+			DateAdded:           time.Now().Add(-time.Hour * 48).Unix(),
+			Category:            pbrc.ReleaseMetadata_IN_COLLECTION,
+			MoveFolder:          242017,
+			GoalFolder:          242017,
+			FiledUnder:          pbrc.ReleaseMetadata_FILE_12_INCH,
+			WeightInGrams:       300,
+			RecordWidth:         1.0,
+			Keep:                pbrc.ReleaseMetadata_KEEP_UNKNOWN,
+			DigitalAvailability: pbrc.ReleaseMetadata_DIGITAL_AVAILABLE,
+			PackageScore:        3,
+			Notes:               "Some notes",
+		},
+	})
+
+	resp, err := s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: 12347})
+	if err != nil {
+		t.Fatalf("Expected ClientUpdate to succeed without keeper judgement, got error: %v", err)
+	}
+	if resp == nil {
+		t.Errorf("Expected non-nil ClientUpdateResponse")
+	}
+}
+
 

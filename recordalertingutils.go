@@ -74,7 +74,7 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 		}
 
 		issue, err := s.ImmediateIssue(ctx, fmt.Sprintf("%v [%v] %v", r.GetRelease().GetTitle(), r.GetRelease().GetInstanceId(), errorMessage), detail,
-			(class == pb.Problem_NEEDS_KEEPER || class == pb.Problem_MISSING_FILED || class == pb.Problem_MISSING_WEIGHT), false, "type-process")
+			(class == pb.Problem_MISSING_FILED || class == pb.Problem_MISSING_WEIGHT), false, "type-process")
 		s.CtxLog(ctx, fmt.Sprintf("Added issue %v -> %v", issue, err))
 		if err != nil {
 			return err
@@ -114,7 +114,6 @@ func (s *Server) adjustState(ctx context.Context, config *pb.Config, r *pbrc.Rec
 			class == pb.Problem_MISSING_WIDTH ||
 			class == pb.Problem_MISSING_FILED ||
 			class == pb.Problem_NEEDS_DIGITAL ||
-			class == pb.Problem_NEEDS_KEEPER ||
 			class == pb.Problem_NEEDS_SOLD_DETAILS ||
 			class == pb.Problem_BAD_BANDCAMP ||
 			class == pb.Problem_MISSING_SLEEVE ||
@@ -196,7 +195,7 @@ func (s *Server) needsSold(ctx context.Context, config *pb.Config, r *pbrc.Recor
 
 func (s *Server) needsKeeperJudgement(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
 	return s.adjustState(ctx, config, r,
-		time.Since(time.Unix(r.GetMetadata().GetDateAdded(), 0)) > time.Hour*24 && r.GetMetadata().GetFiledUnder() != pbrc.ReleaseMetadata_FILE_DIGITAL && (r.GetRelease().GetFolderId() == 812802 || r.GetRelease().GetFolderId() == 7651472 || r.GetRelease().GetFolderId() == 7665013 || r.GetRelease().GetFolderId() == 7664293) && r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_IN_COLLECTION && r.GetMetadata().GetKeep() == pbrc.ReleaseMetadata_KEEP_UNKNOWN, pb.Problem_NEEDS_KEEPER, "needs keeper judgement")
+		false, pb.Problem_NEEDS_KEEPER, "needs keeper judgement")
 }
 
 func (s *Server) needsDigitalAssess(ctx context.Context, config *pb.Config, r *pbrc.Record) error {
